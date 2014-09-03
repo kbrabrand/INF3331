@@ -13,9 +13,13 @@ else
     path=$1;
     word=$2;
 
-    # Use find to
-    # 1. find files changed during the last $days days
-    # 2. get the size for each of the matched files
-    # 3. sort the list of files in ascending order
-    find $path -type f | xargs grep $word -n
+    # Execute find command and grep for a string in all matches
+    response=$(find $path -type f | xargs grep $word -n);
+
+    # Return command output if non-empty string, informative string if not
+    if [[ -n $response ]]; then
+        echo "$response"
+    else
+        echo "No files containing \"$word\" found"
+    fi
 fi
