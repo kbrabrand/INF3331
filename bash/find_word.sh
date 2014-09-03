@@ -9,7 +9,7 @@ then
     echo "usage: find_word.sh path word";
     exit 1
 else
-    # Set path and days arguments as variables to improve readability
+    # Set provided path and word to search for as variables
     path=$1;
     word=$2;
 
