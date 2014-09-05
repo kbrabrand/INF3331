@@ -4,4 +4,4 @@ Task 1.1-1.4 in [bash dir](https://github.com/UiO-INF3331/INF3331-Kristoffer/tre
 
 Explanation of tasks can be found in the oblig1.tex/pdf and in the inline comments.
 
-Kristoffer
+– Kristoffer
