@@ -1,0 +1,158 @@
+\documentclass{article}
+
+\usepackage{fancyvrb}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\title{Obligatorisk innlevering 1 høsten 2014, INF3331}
+\author{Kristoffer Brabrand <kristrek@student.matnat.uio.no>}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Oppgave 1.1}
+
+Oppgaven er løst ved bruk av \verb;find;, \verb;xargs;, \verb;du; og \verb;sort;.
+
+Først brukes \verb;find; til å lete etter filer med modifisert timestamp i løpet av  det antall dager spesifisert når skriptet kalles.
+
+Resultatet pipes til \verb;xargs; som kaller på \verb;du;, som igjen returnerer størrelse (i kilobyte) og navn på hver fil.
+
+Til slutt pipes resultatet videre til \verb;sort; som sorterer stigende.
+
+\subsection*{Kjøring}
+Når man står i roten av oppgavemappen kan skriptet kjøres med kommandoen under. Skriptet krever et heltall for dag-parameteret.
+\begin{Verbatim}[fontsize=\small, frame=single]
+$ ./bash/list_new_files path days
+\end{Verbatim}
+
+Eksempelresultat:
+\begin{Verbatim}[fontsize=\small, frame=single]
+ 36K	file_tree/Kq0Wv/MH/zWG/Exw0zNwi
+ 36K	file_tree/Pkvye/htZiVgRE
+ 40K	file_tree/Kq0Wv/MH/zWG/LwgfcJ8
+ 48K	file_tree/Kq0Wv/5RYWI5kQ
+ 84K	file_tree/Kq0Wv/MH/gBwNRP
+104K	file_tree/Kq0Wv/MH/7GvTL2y
+176K	file_tree/Kq0Wv/MH/zWG/1zeD9ON
+\end{Verbatim}
+
+\section*{Oppgave 1.2}
+
+Oppgaven er løst ved bruk av \verb;find;, \verb;xargs;, \verb;grep;.
+
+Først brukes \verb;find; til å finne alle filer.
+
+Resultatet pipes til \verb;xargs; som kaller på \verb;grep;, som leter etter et ord og returnerer linjenummeret og linjen der søkeordet ble funnet.
+
+\subsection*{Kjøring}
+Når man står i roten av oppgavemappen kan skriptet kjøres med kommandoen under.
+\begin{Verbatim}[fontsize=\small, frame=single]
+$ ./bash/list_new_files path word
+\end{Verbatim}
+
+Eksempelresultat:
+\begin{Verbatim}[fontsize=\small, frame=single]
+file_tree/_CVcim:541:V_3fxWfSRqJrarezHd
+file_tree/Kq0Wv/5RYWI5kQ:1384:3jz26eTjD1CBiZ7kI5iU5FareaF
+file_tree/Kq0Wv/5RYWI5kQ:1957:1i9icbd2qzTcgLB50LCFRZUFKfUarelQ
+file_tree/Kq0Wv/MH/_Oj2c0QA:22304:csCA8TAfarezymEYdYtmGL_eB
+file_tree/Kq0Wv/MH/Z9kP8NB:7194:KLrM0iDmhareiDWreks
+file_tree/Kq0Wv/MH/Z9kP8NB:7992:9MifsLNareBB1gfBjADQWTcVUNT
+[...]
+\end{Verbatim}
+
+\section*{Oppgave 1.3}
+
+Oppgaven er løst ved bruk av \verb;find;. Alle filer med en størrelse over det antall kilobyte som er gitt skriptet som paramter returneres og \verb;find;s exec-parameter brukes for å returnere filnavnet på alle disse filene. I tillegg brukes delete-parameteret, sletter alle filer som passet til de andre kriteriene til find-kommandoen.
+
+\subsection*{Kjøring}
+Når man står i roten av oppgavemappen kan skriptet kjøres med kommandoen under. Skriptet krever et heltall for dag-parameteret.
+\begin{Verbatim}[fontsize=\small, frame=single]
+$ ./bash/sized_delete.sh path size
+\end{Verbatim}
+
+Eksempelresultat ved treff:
+\begin{Verbatim}[fontsize=\small, frame=single]
+Deleting...
+file_tree/Kq0Wv/MH/_Oj2c0QA
+file_tree/Kq0Wv/MH/XhdhBbk
+file_tree/Kq0Wv/MH/Z9kP8NB
+file_tree/Kq0Wv/MH/zWG/8puxfjS
+file_tree/Kq0Wv/MH/zWG/Qww53eF
+file_tree/LGPbdlRW
+\end{Verbatim}
+Eksempelresultat dersom skriptet ikke finner filer med størrelse over det angitte antall kilobytes:
+\begin{Verbatim}[fontsize=\small, frame=single]
+No files of size larger than 350 kilobytes found
+\end{Verbatim}
+
+\section*{Oppgave 1.4}
+
+Oppgaven er løst ved bruk av \verb;sort;.
+
+Sort tar en fil, sorterer linjene i stigende rekkefølge og returnerer linjene i sortert rekkefølge. Ved bruk av \textbf{-o}-parameteret skrives output fra sorteringen til fil i stedet for stdout.
+
+\subsection*{Kjøring}
+Når man står i roten av oppgavemappen kan skriptet kjøres med kommandoen under. Skriptet krever et heltall for dag-parameteret.
+\begin{Verbatim}[fontsize=\small, frame=single]
+$ ./bash/sort_file.sh source destionation
+\end{Verbatim}
+
+Eksempelresultat:
+\begin{Verbatim}[fontsize=\small, frame=single]
+$ cat unsorted
+orange
+pear
+apple
+grape
+pineapple
+
+$ ./bash/sort_file.sh unsorted sorted && cat sorted
+apple
+grape
+orange
+pear
+pineapple
+\end{Verbatim}
+
+\section*{Oppgave 2}
+
+Ved løsingen av oppgaven er det tatt utgangspunkt i malen som ble lagt ut på Github.
+
+Det er brukt rekursjon for både generering og populering av mappetreet. Hjelp til bruk av filtre-generatoren gis ved å kalle skriptet uten parametre.
+
+For å gjøre det enklere å se hva som er filer og hva som er mapper har jeg lagt til .file som filendelse på alle filene.
+
+\subsection*{Kjøring}
+Eksempelresultat ved kall uten parametre:
+\begin{Verbatim}[fontsize=\small, frame=single]
+$ ./python/generate_filetree.py
+Not enough arguments included.
+usage: ./python/generate_filetree.py target dirs files [size rec_depth
+start end seed verbose]
+\end{Verbatim}
+
+Eksempelresultat ved kall med påkrevde parametre:
+\begin{Verbatim}[fontsize=\small, frame=single]
+$ ./python/generate_filetree.py testdir 2 2 && tree testdir
+testdir
+|-- XkVsYva
+| |-- 1JBat2cj
+| | |-- 4a6RLqt.file
+| | |-- 7bdr.file
+| |-- 3VAmq3IByiBW7Ov.file
+| |-- BPi9ZWLjVoD
+|     |-- K1BmIhzAZ4GiN.file
+|     |-- rH.file
+|-- bZK
+    |-- QUH
+    | |-- Kzqk3sJ5.file
+    |-- Zrr2Kzh4P6jwSxG.file
+    |-- iZ
+        |-- i.file
+
+6 directories, 8 files
+\end{Verbatim}
+\end{document}
