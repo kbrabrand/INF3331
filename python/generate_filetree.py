@@ -53,8 +53,33 @@ verbose : bool
         os.mkdir(target)
 
     if rec_depth > 0:
-        for _ in range(dirs):
+        for _ in range(random.randint(0, dirs)):
             generate_tree(random_string(random.randint(0, 16), target + "/"), dirs, rec_depth - 1, verbose)
+
+def create_file(filepath, size, start_time, end_time, verbose):
+    """
+Generate random file with random content
+
+Parameters
+----------
+filepath : str
+    Path to the file to create
+size : int
+    Maximum size in kilobyte for each file.
+start_time : int
+    Lower bound for access time (atime) and modified time (mtime)
+    allowed in each file.
+    Denoted in Unix time format.
+end_time : int
+    Same as start_time, but for upper bound.
+verbose : bool
+    Be loud about what to do.
+    """
+
+    fo = open(filepath, "wb")
+    fo.write(random_string(random.randint(1, 1024 * size)));
+    fo.close();
+
 
 def populate_tree(target, files=5, size=800, start_time=1388534400,
         end_time=1406851201000, verbose=False):
@@ -79,28 +104,22 @@ verbose : bool
     Be loud about what to do.
     """
 
-    def walk_function(arg, dirname, fnames):
-        """
-Function used in os.path.walk
+    for root, dirs, _ in os.walk(target):
+        for name in dirs:
+            dir_path = os.path.join(root, name)
 
-Following the logic of Python scoping, this is a local function,
-only visible inside of populate_tree.
-This function should be passed to os.path.walk.
+            for _ in range(random.randint(0, files)):
+                file_name = random_string(random.randint(0, 16), dir_path + "/") + ".file"
 
-Parameters
-----------
-arg : obj
-    Arbitrary argument specified at initialization.
-dirname : str
-    Name of a directory in file tree (changes with each call.
-fnames : list
-    List of filenames in file tree.
-        """
-        # Fill in code for walk function
+                create_file(
+                    file_name,
+                    size,
+                    start_time,
+                    end_time,
+                    verbose
+                )
 
-    os.path.walk(target, walk_function, None)
-
-
+            populate_tree(dir_path, files, size, start_time, end_time, verbose);
 
 
 # If-test to ensure code only executed if ran as stand-alone app.
