@@ -3,6 +3,7 @@
 import random   # Random number generator
 import os       # Crossplatform OS rutines
 import sys      # interpreter tools
+import time     # Time lib
 
 
 legal_chars = "abcdefghijklmnopqrstuvwxyz"+\
@@ -49,12 +50,16 @@ verbose : bool
 
     try:
         os.stat(target)
+
+        if verbose: print "[DIR]  %s exists" % target
     except:
         os.mkdir(target)
 
+        if verbose: print "[DIR]  %s created" % target
+
     if rec_depth > 0:
         for _ in range(random.randint(0, dirs)):
-            generate_tree(random_string(random.randint(0, 16), target + "/"), dirs, rec_depth - 1, verbose)
+            generate_tree(random_string(random.randint(1, 16), target + "/"), dirs, rec_depth - 1, verbose)
 
 def create_file(filepath, size, start_time, end_time, verbose):
     """
@@ -76,9 +81,19 @@ verbose : bool
     Be loud about what to do.
     """
 
+    length = random.randint(1, 1024 * size)
+
     fo = open(filepath, "wb")
-    fo.write(random_string(random.randint(1, 1024 * size)));
+    fo.write(random_string(length));
     fo.close();
+
+    atime = random.randint(start_time, end_time)
+    mtime = random.randint(start_time, end_time)
+
+    os.utime(filepath,(atime, mtime))
+
+    if verbose:
+        print "[FILE] %s created (a: %d, m: %d) with %d chars of gibberish" % (filepath, atime, mtime, length)
 
 
 def populate_tree(target, files=5, size=800, start_time=1388534400,
@@ -142,8 +157,8 @@ if __name__ == "__main__":
     rec_depth = l<6 and 2 or int(sys.argv[5])
     start     = l<7 and 1388534400 or int(sys.argv[6])
     end       = l<8 and 1406851200 or int(sys.argv[7])
-    seed      = l<9 and 1 or int(sys.argv[8])
-    verbose   = [l<10 and [0] or int(sys.argv[9])][0]
+    seed      = l<9 and time.time() or int(sys.argv[8])
+    verbose   = (l>9 and int(sys.argv[9]) > 0)
 
     # Fix the random seed (if not None):
     random.seed(seed or None)
