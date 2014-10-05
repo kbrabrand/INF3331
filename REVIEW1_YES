@@ -1,0 +1,28 @@
+
+Oppgave 1
+	
+	(a) list_new_files.sh
+	Koden gjør det den skal. Kult at du bruker regex!
+
+	(b) find_word.sh
+	Her er også alt riktig. Kjempebra!
+	
+	(c) sized_delete.sh
+	Igjen, alt riktig. Bra gjort. Man kan også bruke find... -size +"$size"k | xargs rm -f -v.
+
+	(d) sort_file.sh
+	Riktig. Flott!
+	
+Oppgave 2
+	
+	Koden genererer et filtre slik oppgaven definerer det. Bra!
+
+
+Generelt:
+
+	Programmene løser problemene de skal løse, koden er godt kommentert og lett å forstå. 
+	Rapporten er velskrevet med utfyllende eksempler.
+
+Godkjent. 
+
+
