@@ -5,6 +5,58 @@ import re         # Regular expression tools
 import subprocess # Subprocess module
 import shlex      # Simple lexical analysis
 
+verbatim_plain_pre =   '\\begin{verbatim}\n'
+verbatim_plain_post =  '\end{verbatim}\n'
+
+verbatim_code_pretty_pre =  ("\\begin{shadedquoteBlueBar}\n"
+                             "\\fontsize{9pt}{9pt}\n"
+                             "\\begin{Verbatim}\n");
+
+verbatim_code_pretty_post = ("\\end{Verbatim}\n"
+                             "\\end{shadedquoteBlueBar}\n"
+                             "\\noindent\n");
+
+verbatim_exec_pretty_pre =  '\\begin{Verbatim}[numbers=none,frame=lines,label=\\fbox{{\\tiny Terminal}},fontsize=\\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]\n'
+
+verbatim_exec_pretty_post = ("\\end{Verbatim}\n"
+                             "\\noindent\n");
+
+def verbatim_code(code, pretty=False):
+    """
+Return code wrapped in verbatim block.
+
+code : str
+    String of code to wrap in verbatim.
+pretty : bool
+    Whether to use fancy formatting or not."""
+
+    if (pretty):
+        before = verbatim_code_pretty_pre;
+        after  = verbatim_code_pretty_post;
+    else:
+        before = verbatim_plain_pre;
+        after  = verbatim_plain_post;
+
+    return before + '\n' + code + after;
+
+def verbatim_exec(result, pretty=False):
+    """
+Return execution result wrapped in verbatim block.
+
+result : str
+    String with output from execution to wrap in verbatim.
+pretty : bool
+    Whether to use fancy formatting or not."""
+
+    if (pretty):
+        before = verbatim_exec_pretty_pre
+        after  = verbatim_exec_pretty_post;
+    else:
+        before = verbatim_plain_pre;
+        after  = verbatim_plain_post;
+
+    return before + '\n' + result + after;
+
 def add_pretty_print_block(file_content):
     """
 Add instructions for setting up pretty printing of source code and execution
@@ -93,23 +145,11 @@ Parameters
 file_content : str
     The file_content to search for and replace placeholders in.
 pretty : bool
-    Whether or not to use fancy formatting or not.
+    Whether or not to use fancy formatting.
     """
 
     # Find all lines matching the import statement format
     source_imports = re.findall(r'\n(%@import ([^\ ]+) (.*))\n', file_content);
-
-    if (pretty):
-        before = ("\\begin{shadedquoteBlueBar}\n"
-                  "\\fontsize{9pt}{9pt}\n"
-                  "\\begin{Verbatim}\n");
-
-        after  = ("\\end{Verbatim}\n"
-                  "\\end{shadedquoteBlueBar}\n"
-                  "\\noindent\n");
-    else:
-        before = '\\begin{verbatim}\n';
-        after  = '\end{verbatim}\n';
 
     # For each import statement
     for source_import in source_imports:
@@ -121,9 +161,10 @@ pretty : bool
         # of the referenced file
         file_content = file_content.replace(
             import_statement,
-            before +
-            get_regex_match_in_file(import_file, import_regex) + '\n' +
-            after
+            verbatim_code(
+                get_regex_match_in_file(import_file, import_regex),
+                pretty
+            )
         );
 
     return file_content
@@ -138,17 +179,15 @@ Parameters
 file_content : str
     The file_content to search for and replace placeholders in.
 pretty : bool
-    Whether or not to use fancy formatting or not.
+    Whether or not to use fancy formatting.
     """
 
     if (pretty):
-        before = '\\begin{Verbatim}[numbers=none,frame=lines,label=\\fbox{{\\tiny Terminal}},fontsize=\\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]\n';
-
-        after  = ("\\end{Verbatim}\n"
-                  "\\noindent\n");
+        before = verbatim_exec_pretty_pre;
+        after  = verbatim_exec_pretty_post;
     else:
-        before = '\\begin{verbatim}\n';
-        after  = '\end{verbatim}\n';
+        before = verbatim_plain_pre;
+        after  = verbatim_plain_post;
 
     # Find all lines matching the exec statement format
     script_execs = re.findall(r'\n(%@exec (.*))\n', file_content);
@@ -161,12 +200,67 @@ pretty : bool
         # Replace each statement with the script output in a verbatim block
         file_content = file_content.replace(
             exec_statement,
-            before + '$ ' + exec_script + '\n' +
-            get_exec_result(exec_script) +
-            after
+            verbatim_exec(
+                '$ ' + exec_script + '\n' + get_exec_result(exec_script),
+                pretty
+            )
         );
 
     return file_content
+
+def process_inline_code_blocks(file_content, pretty=False):
+    """
+Identify all inline code blocks and format them in the same fashion as
+the code blocks pulled from referenced files.
+
+Parameters
+----------
+file_content : str
+    The file_content to search for and replace placeholders in.
+pretty : bool
+    Whether to use fancy formatting or not"""
+
+    # Find all lines matching the import statement format
+    code_blocks = re.findall(r'(%@import\n((.*\n)+?)%@)', file_content, re.MULTILINE);
+
+     # For each import statement
+    for code_block in code_blocks:
+        outer_block = code_block[0];
+        inner_block = code_block[1];
+
+        file_content = file_content.replace(
+            outer_block,
+            verbatim_code(inner_block, pretty)
+        );
+
+    return file_content;
+
+def process_inline_exec_blocks(file_content, pretty=False):
+    """
+Identify all inline exec result blocks and format them in the same fashion as
+the exec result blocks pulled from referenced files.
+
+Parameters
+----------
+file_content : str
+    The file_content to search for and replace placeholders in.
+pretty : bool
+    Whether to use fancy formatting or not"""
+
+    # Find all lines matching the exec statement format
+    exec_blocks = re.findall(r'(%@exec\n((.*\n)+?)%@)', file_content, re.MULTILINE);
+
+     # For each import statement
+    for exec_block in exec_blocks:
+        outer_block = exec_block[0];
+        inner_block = exec_block[1];
+
+        file_content = file_content.replace(
+            outer_block,
+            verbatim_exec(inner_block, pretty)
+        );
+
+    return file_content;
 
 def process_file(input, output, verbose=False, pretty=False):
     """
@@ -191,11 +285,17 @@ pretty : bool
         # Inject latex pretty print stuff before preamble
         file_content = add_pretty_print_block(file_content);
 
-    # Replace "%@ import..." statements with matched line in source file
+    # Replace "%@import..." statements with matched line in source file
     file_content = inject_source_code(file_content, pretty);
 
-    # Replace "%@ exec..." statements with output from script execution
+    # Replace "%@exec..." statements with output from script execution
     file_content = inject_script_output(file_content, pretty);
+
+    # Replace inline source code statement; "%@import .... %@"
+    file_content = process_inline_code_blocks(file_content, pretty);
+
+    # Replace inline exec result statement; "%@exec .... %@"
+    file_content = process_inline_exec_blocks(file_content, pretty);
 
     # Write to output file
     output_file = open(output, 'w');
