@@ -208,10 +208,10 @@ pretty : bool
 
     return file_content
 
-def process_inline_code_blocks(file_content, pretty=False):
+def process_inline_blocks(file_content, pretty=False):
     """
-Identify all inline code blocks and format them in the same fashion as
-the code blocks pulled from referenced files.
+Identify all inline code and exec result blocks and format them in the same
+fashion as the exec result blocks pulled from referenced files.
 
 Parameters
 ----------
@@ -220,25 +220,30 @@ file_content : str
 pretty : bool
     Whether to use fancy formatting or not"""
 
-    # Find all lines matching the import statement format
-    code_blocks = re.findall(r'(%@import\n((.*\n)+?)%@)', file_content, re.MULTILINE);
+    # Find all lines matching the exec or import statement format
+    blocks = re.findall(r'(%@(import|exec)\n((.*\n)+?)%@)', file_content, re.MULTILINE);
 
-     # For each import statement
-    for code_block in code_blocks:
-        outer_block = code_block[0];
-        inner_block = code_block[1];
+    # For each import statement
+    for block in blocks:
+        outer_block = block[0];
+        block_type  = block[1];
+        inner_block = block[2];
+
+        if (inner_block == "import"):
+            formatted_block = verbatim_code(inner_block, pretty);
+        else:
+            formatted_block = verbatim_exec(inner_block, pretty);
 
         file_content = file_content.replace(
             outer_block,
-            verbatim_code(inner_block, pretty)
+            formatted_block
         );
 
     return file_content;
 
-def process_inline_exec_blocks(file_content, pretty=False):
+def process_inline_fake(file_content, pretty=False):
     """
-Identify all inline exec result blocks and format them in the same fashion as
-the exec result blocks pulled from referenced files.
+Identify inline code blocks to execute, execute it and print the code blocks.
 
 Parameters
 ----------
@@ -247,18 +252,32 @@ file_content : str
 pretty : bool
     Whether to use fancy formatting or not"""
 
-    # Find all lines matching the exec statement format
-    exec_blocks = re.findall(r'(%@exec\n((.*\n)+?)%@)', file_content, re.MULTILINE);
+    # Find inline code blocks for execution
+    blocks = re.findall(r'(%@(bash|python) (.*)\n((.*\n)+?)%@)', file_content, re.MULTILINE);
 
-     # For each import statement
-    for exec_block in exec_blocks:
-        outer_block = exec_block[0];
-        inner_block = exec_block[1];
+    for block in blocks:
+        if (block[1] == 'python'):
+            code_type    = block[1]; # python or bash
+            fake_command = block[2];
+            code_block   = block[3];
 
-        file_content = file_content.replace(
-            outer_block,
-            verbatim_exec(inner_block, pretty)
-        );
+            # Open a sub process for executing the code block
+            process   = subprocess.Popen([code_type, '-c', code_block], stdout=subprocess.PIPE);
+
+            # Get the piped output and return
+            out, err = process.communicate();
+
+            # Replace each statement with the script output in a verbatim block
+            file_content = file_content.replace(
+                block[0],
+                verbatim_exec(
+                    '$ %s %s \n%s' % (code_type, fake_command, out),
+                    pretty
+                )
+            );
+
+        #print block;
+        #print "\n\n"
 
     return file_content;
 
@@ -291,11 +310,11 @@ pretty : bool
     # Replace "%@exec..." statements with output from script execution
     file_content = inject_script_output(file_content, pretty);
 
-    # Replace inline source code statement; "%@import .... %@"
-    file_content = process_inline_code_blocks(file_content, pretty);
+    # Replace inline source code statement; "%@(import|exec) .... %@"
+    file_content = process_inline_blocks(file_content, pretty);
 
-    # Replace inline exec result statement; "%@exec .... %@"
-    file_content = process_inline_exec_blocks(file_content, pretty);
+    # Replace fake code/exec statements
+    file_content = process_inline_fake(file_content, pretty);
 
     # Write to output file
     output_file = open(output, 'w');
