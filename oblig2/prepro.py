@@ -281,6 +281,22 @@ pretty : bool
 
     return file_content;
 
+def process_input_instructions(file_content):
+    """
+Identify latex input instructions and replace them with the actual instructions
+from the referenced files.
+
+Parameters
+----------
+file_content : str
+    The file_content to add the instructions to."""
+
+    input_instructions = re.findall(r'(\\input{(.*)})', file_content);
+
+    # Implement read from file and replacement of input instruction...
+
+    return file_content;
+
 def process_file(input, output, verbose=False, pretty=False):
     """
 Process a latex file and augment it with source code, execution results and
@@ -299,6 +315,9 @@ pretty : bool
     """
 
     file_content = open(input).read();
+
+    # Insert content of files referenced by \input instruction
+    file_content = process_input_instructions(file_content);
 
     if (pretty):
         # Inject latex pretty print stuff before preamble
