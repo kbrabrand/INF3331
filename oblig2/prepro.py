@@ -293,7 +293,11 @@ file_content : str
 
     input_instructions = re.findall(r'(\\input{(.*)})', file_content);
 
-    # Implement read from file and replacement of input instruction...
+    for input_instruction in input_instructions:
+        file_name     = input_instruction[1];
+        input_content = open(file_name).read();
+
+        file_content = file_content.replace(input_instruction[0], input_content);
 
     return file_content;
 
