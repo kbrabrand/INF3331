@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import subprocess;
+import argparse;
 import sys;
 import re;
 
@@ -21,7 +22,9 @@ path_to_file : str
 
     error_lines = re.findall(r'.*:[0-9]+:.*', out);
 
-    print "\n".join(error_lines) + "\n";
+    if len(error_lines) > 0:
+        print "\n".join(error_lines) + "\n";
+
     print "\n".join(out.splitlines()[-2:]);
 
 # If-test to ensure code only executed if ran as stand-alone app.
