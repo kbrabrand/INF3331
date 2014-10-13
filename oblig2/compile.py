@@ -4,17 +4,36 @@ import subprocess;
 import argparse;
 import sys;
 import re;
+import os;
 
-def compile_latex_file(path_to_file):
+def compile_latex_file(source, destination, interactive):
     """
 Return code wrapped in verbatim block.
 
-path_to_file : str
-    Path to latex file to process"""
+source : str
+    Path to latex source file
+destination : str
+    Path to where the compiled file should be put
+interactive : str
+    Whether to enable interaction with latex compiler or not"""
+
+    arguments = ['pdflatex', '-file-line-error'];
+
+    # Set interaction to nonstopmode if interactive is not set to
+    # a truthive value
+    if interactive == False:
+        arguments.append('-interaction=nonstopmode');
+
+    # Add output destination directory if provided
+    if destination != False:
+        arguments.append('-output-directory');
+        arguments.append(destination);
+
+    # Append source file to argument array
+    arguments.append(source);
 
     proc = subprocess.Popen(
-        "pdflatex -file-line-error -interaction=nonstopmode %s" % path_to_file,
-        shell=True,
+        arguments,
         stdout=subprocess.PIPE
     );
 
@@ -30,13 +49,17 @@ path_to_file : str
 # If-test to ensure code only executed if ran as stand-alone app.
 if __name__ == "__main__":
 
-    l = len(sys.argv)
+    parser = argparse.ArgumentParser(description='Compile PDF from latex file.')
 
-    if l < 2:
-        print "Not enough arguments included."
-        print "usage: %s input_file " % sys.argv[0];
-        sys.exit(0);
+    parser.add_argument('--interactive', '-i', dest='interactive', help="Interact with the latex compiler", action='store_true');
 
-    input_file  = sys.argv[1];
+    parser.add_argument('source',  metavar='S', help='Latex source file')
 
-    compile_latex_file(input_file);
+    parser.add_argument('--destination', '-d', metavar='D',
+                        dest='destination', help='Path to where the compiled file should be put',
+                        default=False);
+
+
+    args = parser.parse_args();
+
+    compile_latex_file(args.source, args.destination, args.interactive);
