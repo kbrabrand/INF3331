@@ -16,7 +16,7 @@ verbatim_code_pretty_post = ("\\end{Verbatim}\n"
                              "\\end{shadedquoteBlueBar}\n"
                              "\\noindent\n");
 
-verbatim_exec_pretty_pre =  '\\begin{Verbatim}[numbers=none,frame=lines,label=\\fbox{{\\tiny Terminal}},fontsize=\\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]\n'
+verbatim_exec_pretty_pre =  '\\begin{Verbatim}[numbers=none,frame=lines,label=\\fbox{{\\tiny Terminal}},fontsize=\\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]'
 
 verbatim_exec_pretty_post = ("\\end{Verbatim}\n"
                              "\\noindent\n");
