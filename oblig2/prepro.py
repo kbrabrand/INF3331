@@ -5,7 +5,7 @@ import re         # Regular expression tools
 import subprocess # Subprocess module
 import shlex      # Simple lexical analysis
 
-verbatim_plain_pre =   '\\begin{verbatim}\n'
+verbatim_plain_pre =   '\\begin{verbatim}'
 verbatim_plain_post =  '\end{verbatim}\n'
 
 verbatim_code_pretty_pre =  ("\\begin{shadedquoteBlueBar}\n"
