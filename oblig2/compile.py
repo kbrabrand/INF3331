@@ -2,9 +2,7 @@
 
 import subprocess;
 import argparse;
-import sys;
 import re;
-import os;
 
 def compile_latex_file(source, destination, interactive, verbose=False):
     """
