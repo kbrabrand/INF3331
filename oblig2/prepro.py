@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-import sys        # interpreter tools
 import re         # Regular expression tools
 import subprocess # Subprocess module
 import shlex      # Simple lexical analysis
+import argparse;  # Argument parsing tools
 
 verbatim_plain_pre =   '\\begin{verbatim}'
 verbatim_plain_post =  '\end{verbatim}\n'
@@ -348,17 +348,24 @@ pretty : bool
 # If-test to ensure code only executed if ran as stand-alone app.
 if __name__ == "__main__":
 
-    l = len(sys.argv)
+    parser = argparse.ArgumentParser(description='Compile PDF from latex file.');
 
-    if l < 3:
-        print "Not enough arguments included."
-        print "usage: %s input output " % sys.argv[0];
-        sys.exit(0)
+    parser.add_argument('source',  metavar='source', help='Path to preprocess source file');
 
-    input_file  = sys.argv[1]
-    output_file = sys.argv[2]
-    pretty      = True if (l >= 4) else False;
-    verbose     = False;
+    parser.add_argument('destination', metavar='dest',
+                        help='Destination folder for the processed file');
 
-    process_file(input_file, output_file, verbose, pretty);
+    parser.add_argument('--pretty', '-p', dest='pretty', help="Enable fancy verbatims",
+                        action='store_true', default=True);
 
+    parser.add_argument('--verbose', '-v', dest='verbose',
+                        help="Enable verbose script output", action='store_true');
+
+    args = parser.parse_args();
+
+    process_file(
+        args.source,
+        args.destination,
+        args.verbose,
+        args.pretty
+    );
