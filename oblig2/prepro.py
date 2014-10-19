@@ -286,16 +286,25 @@ def inject_script_output(file_content, pretty=False):
     return file_content
 
 def process_inline_blocks(file_content, pretty=False):
-    """
-Identify all inline code and exec result blocks and format them in the same
-fashion as the exec result blocks pulled from referenced files.
+    r"""
+    Identify all inline code and exec result blocks and format them in the same
+    fashion as the exec result blocks pulled from referenced files.
 
-Parameters
-----------
-file_content : str
-    The file_content to search for and replace placeholders in.
-pretty : bool
-    Whether to use fancy formatting or not"""
+    Parameters
+    ----------
+    file_content : str
+        The file_content to search for and replace placeholders in.
+    pretty : bool
+        Whether to use fancy formatting or not
+
+    Test that code import blocks are picked up and formatted
+    >>> process_inline_blocks('foobar\n%@import\n<?php\nvar_dump($_POST);\n%@\ntest\n%@import\ndef test(a, b):\n    print \'foobar\';\n%@\nstuff')
+    "foobar\n\\begin{verbatim}\n<?php\nvar_dump($_POST);\n\\end{verbatim}\n\ntest\n\\begin{verbatim}\ndef test(a, b):\n    print 'foobar';\n\\end{verbatim}\n\nstuff"
+
+    Test that exec result blocks are picked up and formatted
+    >>> process_inline_blocks('foobar\n%@exec\n$ echo "Just another Perl hacker"\n%@\nstuff')
+    'foobar\n\\begin{verbatim}\n$ echo "Just another Perl hacker"\n\\end{verbatim}\n\nstuff'
+    """
 
     # Find all lines matching the exec or import statement format
     blocks = re.findall(r'(%@(import|exec)\n((.*\n)+?)%@)', file_content, re.MULTILINE);
