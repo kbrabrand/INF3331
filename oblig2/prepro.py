@@ -35,7 +35,7 @@ def verbatim_code(code, pretty=False):
     '\\begin{verbatim}\nfoobar\\end{verbatim}\n'
 
     Test fancy verbatim code print
-    >>> verbatim_code("foobar", True)
+    >>> verbatim_code("foobar", pretty=True)
     '\\begin{shadedquoteBlueBar}\n\\fontsize{9pt}{9pt}\n\\begin{Verbatim}\n\nfoobar\\end{Verbatim}\n\\end{shadedquoteBlueBar}\n\\noindent\n'
     """
 
@@ -62,7 +62,7 @@ def verbatim_exec(result, pretty=False):
     '\\begin{verbatim}\nfoobar\\end{verbatim}\n'
 
     Test fancy verbatim exec result print
-    >>> verbatim_exec("foobar", True)
+    >>> verbatim_exec("foobar", pretty=True)
     '\\begin{Verbatim}[numbers=none,frame=lines,label=\\fbox{{\\tiny Terminal}},fontsize=\\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]\nfoobar\\end{Verbatim}\n\\noindent\n'
     """
 
@@ -197,16 +197,28 @@ def get_exec_result(command):
     return out;
 
 def inject_source_code(file_content, pretty=False):
-    """
-Replace all "%@ import..." statements in the latex file with the source code
-it refers to.
+    r"""
+    Replace all "%@ import..." statements in the latex file with the source code
+    it refers to.
 
-Parameters
-----------
-file_content : str
-    The file_content to search for and replace placeholders in.
-pretty : bool
-    Whether or not to use fancy formatting.
+    Parameters
+    ----------
+    file_content : str
+        The file_content to search for and replace placeholders in.
+    pretty : bool
+        Whether or not to use fancy formatting.
+
+    Test that the input string is returned when there's no match
+    >>> inject_source_code('a few words')
+    'a few words'
+
+    Test that a valid import statement is parsed and injected
+    >>> inject_source_code('foobar\n%@import ./prepro.py (def get_regex(.*))+\nstuff')
+    'foobar\n\\begin{verbatim}\ndef get_regex_match_in_file(file, regex):\\end{verbatim}\n\nstuff'
+
+    Test that a string containing two import statements is handled correctly
+    >>> inject_source_code('foobar\n%@import ./prepro.py (def get_regex(.*))+\nstuff\n%@import ./prepro.py (def get_regex(.*))+\nmore stuff')
+    'foobar\n\\begin{verbatim}\ndef get_regex_match_in_file(file, regex):\\end{verbatim}\n\nstuff\n\\begin{verbatim}\ndef get_regex_match_in_file(file, regex):\\end{verbatim}\n\nmore stuff'
     """
 
     # Find all lines matching the import statement format
