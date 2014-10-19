@@ -23,19 +23,18 @@ verbatim_exec_pretty_post = ("\\end{Verbatim}\n"
 
 def verbatim_code(code, pretty=False):
     r"""
-Return code wrapped in verbatim block.
+    Return code wrapped in verbatim block.
 
-code : str
-    String of code to wrap in verbatim.
-pretty : bool
-    Whether to use fancy formatting or not.
+    code : str
+        String of code to wrap in verbatim.
+    pretty : bool
+        Whether to use fancy formatting or not.
 
->>> verbatim_code("foobar")
-'\\begin{verbatim}\nfoobar\\end{verbatim}\n'
+    >>> verbatim_code("foobar")
+    '\\begin{verbatim}\nfoobar\\end{verbatim}\n'
 
->>> verbatim_code("foobar", True)
-'\\begin{shadedquoteBlueBar}\n\\fontsize{9pt}{9pt}\n\\begin{Verbatim}\n\nfoobar\\end{Verbatim}\n\\end{shadedquoteBlueBar}\n\\noindent\n'
-
+    >>> verbatim_code("foobar", True)
+    '\\begin{shadedquoteBlueBar}\n\\fontsize{9pt}{9pt}\n\\begin{Verbatim}\n\nfoobar\\end{Verbatim}\n\\end{shadedquoteBlueBar}\n\\noindent\n'
     """
 
     if (pretty):
@@ -48,13 +47,20 @@ pretty : bool
     return before + '\n' + code + after;
 
 def verbatim_exec(result, pretty=False):
-    """
-Return execution result wrapped in verbatim block.
+    r"""
+    Return execution result wrapped in verbatim block.
 
-result : str
-    String with output from execution to wrap in verbatim.
-pretty : bool
-    Whether to use fancy formatting or not."""
+    result : str
+        String with output from execution to wrap in verbatim.
+    pretty : bool
+        Whether to use fancy formatting or not.
+
+    >>> verbatim_exec("foobar")
+    '\\begin{verbatim}\nfoobar\\end{verbatim}\n'
+
+    >>> verbatim_exec("foobar", True)
+    '\\begin{Verbatim}[numbers=none,frame=lines,label=\\fbox{{\\tiny Terminal}},fontsize=\\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]\nfoobar\\end{Verbatim}\n\\noindent\n'
+    """
 
     if (pretty):
         before = verbatim_exec_pretty_pre
