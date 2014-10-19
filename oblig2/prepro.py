@@ -243,16 +243,20 @@ def inject_source_code(file_content, pretty=False):
     return file_content
 
 def inject_script_output(file_content, pretty=False):
-    """
-Replace all "%@ exec..." statements in the latex file with the source code
-it refers to.
+    r"""
+    Replace all "%@exec..." statements in the latex file with the source code
+    it refers to.
 
-Parameters
-----------
-file_content : str
-    The file_content to search for and replace placeholders in.
-pretty : bool
-    Whether or not to use fancy formatting.
+    Parameters
+    ----------
+    file_content : str
+        The file_content to search for and replace placeholders in.
+    pretty : bool
+        Whether or not to use fancy formatting.
+
+    Test that an exec statement is matched and converted to a verbatim block
+    >>> inject_script_output('foobar\n%@exec echo 1337\n')
+    'foobar\n\\begin{verbatim}\n$ echo 1337\n1337\n\\end{verbatim}\n\n'
     """
 
     if (pretty):
