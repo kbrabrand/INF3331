@@ -72,12 +72,21 @@ def verbatim_exec(result, pretty=False):
     return before + '\n' + result + after;
 
 def add_pretty_print_block(file_content):
-    """
-Add instructions for setting up pretty printing of source code and execution
-results after the documentclass instruction.
+    r"""
+    Add instructions for setting up pretty printing of source code and execution
+    results after the documentclass instruction.
 
-file_content : str
-    The file_content to add the instructions to."""
+    file_content : str
+        The file_content to add the instructions to.
+
+    >>> add_pretty_print_block('1337 bits of rubbish');
+    Traceback (most recent call last):
+    ...
+    Exception: No documentclass found
+
+    >>> add_pretty_print_block('\\documentclass{article}\nstuff')
+    '\\documentclass{article}\n\\usepackage{fancyvrb}\n\\usepackage{framed}\n\\usepackage{color}\n\\providecommand{\\shadedwbar}{}\n\\definecolor{shadecolor}{rgb}{0.87843, 0.95686, 1.0}\n\\renewenvironment{shadedwbar}{\n\\def\\FrameCommand{\\color[rgb]{0.7,     0.95686, 1}\\vrule width 1mm\\normalcolor\\colorbox{shadecolor}}\\FrameRule0.6pt\n\\MakeFramed {\\advance\\hsize-2mm\\FrameRestore}\\vskip3mm}{\\vskip0mm\\endMakeFramed}\n\\providecommand{\\shadedquoteBlueBar}{}\n\\renewenvironment{shadedquoteBlueBar}[1][]{\n\\bgroup\\rmfamily\n\\fboxsep=0mm\\relax\n\\begin{shadedwbar}\n\\list{}{\\parsep=-2mm\\parskip=0mm\\topsep=0pt\\leftmargin=2mm\n\\rightmargin=2\\leftmargin\\leftmargin=4pt\\relax}\n\\item\\relax}\n{\\endlist\\end{shadedwbar}\\egroup}\n\nstuff'
+    """
 
     pretty_print_setup = ("\usepackage{fancyvrb}\n"
                           "\usepackage{framed}\n"
