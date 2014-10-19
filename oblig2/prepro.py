@@ -16,19 +16,27 @@ verbatim_code_pretty_post = ("\\end{Verbatim}\n"
                              "\\end{shadedquoteBlueBar}\n"
                              "\\noindent\n");
 
-verbatim_exec_pretty_pre =  '\\begin{Verbatim}[numbers=none,frame=lines,label=\\fbox{{\\tiny Terminal}},fontsize=\\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]'
+verbatim_exec_pretty_pre =  "\\begin{Verbatim}[numbers=none,frame=lines,label=\\fbox{{\\tiny Terminal}},fontsize=\\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]"
 
 verbatim_exec_pretty_post = ("\\end{Verbatim}\n"
                              "\\noindent\n");
 
 def verbatim_code(code, pretty=False):
-    """
+    r"""
 Return code wrapped in verbatim block.
 
 code : str
     String of code to wrap in verbatim.
 pretty : bool
-    Whether to use fancy formatting or not."""
+    Whether to use fancy formatting or not.
+
+>>> verbatim_code("foobar")
+'\\begin{verbatim}\nfoobar\\end{verbatim}\n'
+
+>>> verbatim_code("foobar", True)
+'\\begin{shadedquoteBlueBar}\n\\fontsize{9pt}{9pt}\n\\begin{Verbatim}\n\nfoobar\\end{Verbatim}\n\\end{shadedquoteBlueBar}\n\\noindent\n'
+
+    """
 
     if (pretty):
         before = verbatim_code_pretty_pre;
@@ -347,6 +355,8 @@ pretty : bool
 
 # If-test to ensure code only executed if ran as stand-alone app.
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
 
     parser = argparse.ArgumentParser(description='Compile PDF from latex file.');
 
