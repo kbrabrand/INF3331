@@ -155,22 +155,33 @@ def get_regex_match_in_file(file, regex):
 
 def get_exec_result(command):
     """
-Execute the command and return the result.
+    Parse and execute a command and return the result.
 
-Parameters
-----------
-command : str
-    Command to execute.
+    Parameters
+    ----------
+    command : str
+        Command to execute.
+
+    >>> get_exec_result('echo 1337')
+    '1337\\n'
+
+    >>> get_exec_result('\o\ |o| /o/')
+    Traceback (most recent call last):
+    ...
+    Exception: Execution of command failed
     """
 
     # Parse/split the command into arguments
     arguments = shlex.split(command);
 
-    # Open a sub process with the arguments
-    process   = subprocess.Popen(arguments, stdout=subprocess.PIPE);
+    try:
+        # Open a sub process with the arguments
+        process   = subprocess.Popen(arguments, stdout=subprocess.PIPE);
 
-    # Get the piped output and return
-    out, err = process.communicate();
+        # Get the piped output and return
+        out, err = process.communicate();
+    except OSError as e:
+        raise Exception('Execution of command failed');
 
     return out;
 
