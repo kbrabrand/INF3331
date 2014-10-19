@@ -118,17 +118,33 @@ def add_pretty_print_block(file_content):
 
 def get_regex_match_in_file(file, regex):
     """
-Open the given file and return what ever the regex match in the file.
+    Open the given file and return what ever the regex match in the file.
 
-Parameters
-----------
-file : str
-    Path to the file to search for something in.
-regex : str
-    Regex to match for in the file.
+    Parameters
+    ----------
+    file : str
+        Path to the file to search for something in.
+    regex : str
+        Regex to match for in the file.
+
+    >>> get_regex_match_in_file('./prepro.py', '(def get_regex(.*))+')
+    'def get_regex_match_in_file(file, regex):'
+
+    >>> get_regex_match_in_file('./non-existant-file', 'foobar')
+    Traceback (most recent call last):
+    ...
+    Exception: Failed reading file [./non-existant-file]
+
+    >>> get_regex_match_in_file('./prepro.py', '($a)')
+    ''
     """
 
-    match = re.findall(r'' + regex, open(file).read());
+    try:
+        file_content = open(file).read();
+    except IOError as e:
+        raise Exception('Failed reading file [' + file + ']');
+
+    match = re.findall(r'' + regex, file_content);
 
     # If something matched, return the first group of the first match.
     # Otherwise, return an empty string.
