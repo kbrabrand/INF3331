@@ -30,9 +30,11 @@ def verbatim_code(code, pretty=False):
     pretty : bool
         Whether to use fancy formatting or not.
 
+    Test plain verbatim print
     >>> verbatim_code("foobar")
     '\\begin{verbatim}\nfoobar\\end{verbatim}\n'
 
+    Test fancy verbatim code print
     >>> verbatim_code("foobar", True)
     '\\begin{shadedquoteBlueBar}\n\\fontsize{9pt}{9pt}\n\\begin{Verbatim}\n\nfoobar\\end{Verbatim}\n\\end{shadedquoteBlueBar}\n\\noindent\n'
     """
@@ -55,9 +57,11 @@ def verbatim_exec(result, pretty=False):
     pretty : bool
         Whether to use fancy formatting or not.
 
+    Test plain verbatim print
     >>> verbatim_exec("foobar")
     '\\begin{verbatim}\nfoobar\\end{verbatim}\n'
 
+    Test fancy verbatim exec result print
     >>> verbatim_exec("foobar", True)
     '\\begin{Verbatim}[numbers=none,frame=lines,label=\\fbox{{\\tiny Terminal}},fontsize=\\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]\nfoobar\\end{Verbatim}\n\\noindent\n'
     """
@@ -79,11 +83,13 @@ def add_pretty_print_block(file_content):
     file_content : str
         The file_content to add the instructions to.
 
+    Test adding pretty print instructions to document missing documentclass
     >>> add_pretty_print_block('1337 bits of rubbish');
     Traceback (most recent call last):
     ...
     Exception: No documentclass found
 
+    Test adding pretty print instructions to document with documentclass
     >>> add_pretty_print_block('\\documentclass{article}\nstuff')
     '\\documentclass{article}\n\\usepackage{fancyvrb}\n\\usepackage{framed}\n\\usepackage{color}\n\\providecommand{\\shadedwbar}{}\n\\definecolor{shadecolor}{rgb}{0.87843, 0.95686, 1.0}\n\\renewenvironment{shadedwbar}{\n\\def\\FrameCommand{\\color[rgb]{0.7,     0.95686, 1}\\vrule width 1mm\\normalcolor\\colorbox{shadecolor}}\\FrameRule0.6pt\n\\MakeFramed {\\advance\\hsize-2mm\\FrameRestore}\\vskip3mm}{\\vskip0mm\\endMakeFramed}\n\\providecommand{\\shadedquoteBlueBar}{}\n\\renewenvironment{shadedquoteBlueBar}[1][]{\n\\bgroup\\rmfamily\n\\fboxsep=0mm\\relax\n\\begin{shadedwbar}\n\\list{}{\\parsep=-2mm\\parskip=0mm\\topsep=0pt\\leftmargin=2mm\n\\rightmargin=2\\leftmargin\\leftmargin=4pt\\relax}\n\\item\\relax}\n{\\endlist\\end{shadedwbar}\\egroup}\n\nstuff'
     """
@@ -127,14 +133,17 @@ def get_regex_match_in_file(file, regex):
     regex : str
         Regex to match for in the file.
 
+    Match patterin in this file (valid file + content that exist)
     >>> get_regex_match_in_file('./prepro.py', '(def get_regex(.*))+')
     'def get_regex_match_in_file(file, regex):'
 
+    Match pattern in non-existant file
     >>> get_regex_match_in_file('./non-existant-file', 'foobar')
     Traceback (most recent call last):
     ...
     Exception: Failed reading file [./non-existant-file]
 
+    Match pattern that will never be present, in file that exist
     >>> get_regex_match_in_file('./prepro.py', '($a)')
     ''
     """
@@ -162,9 +171,11 @@ def get_exec_result(command):
     command : str
         Command to execute.
 
+    Test valid command, echoing a number
     >>> get_exec_result('echo 1337')
     '1337\\n'
 
+    Test invalid command, and expect Exception
     >>> get_exec_result('\o\ |o| /o/')
     Traceback (most recent call last):
     ...
