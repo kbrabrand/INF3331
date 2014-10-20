@@ -383,7 +383,8 @@ def process_input_instructions(file_content):
     ...
     Exception: Failed reading file [./non-existant-file]
 
-    >>> process_input_instructions('foo\n\input{./abc.tex}\nstuff');
+    Test that a valid file referenced with an input statement is injected
+    >>> process_input_instructions('foo\n\input{./tests/doctest-fixtures/abc.tex}\nstuff');
     'foo\nhei\nstuff'
     """
 
