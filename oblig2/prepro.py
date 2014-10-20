@@ -368,20 +368,34 @@ def process_inline_fake(file_content, pretty=False):
     return file_content;
 
 def process_input_instructions(file_content):
-    """
-Identify latex input instructions and replace them with the actual instructions
-from the referenced files.
+    r"""
+    Identify latex input instructions and replace them with the actual instructions
+    from the referenced files.
 
-Parameters
-----------
-file_content : str
-    The file_content to add the instructions to."""
+    Parameters
+    ----------
+    file_content : str
+        The file_content to add the instructions to.
+
+    Test that exception is thrown when a non-existant file is provided for input
+    >>> process_input_instructions('foo\n\input{./non-existant-file}\nmore stuff')
+    Traceback (most recent call last):
+    ...
+    Exception: Failed reading file [./non-existant-file]
+
+    >>> process_input_instructions('foo\n\input{./abc.tex}\nstuff');
+    'foo\nhei\nstuff'
+    """
 
     input_instructions = re.findall(r'(\\input{(.*)})', file_content);
 
     for input_instruction in input_instructions:
-        file_name     = input_instruction[1];
-        input_content = open(file_name).read();
+        file_name = input_instruction[1];
+
+        try:
+            input_content = open(file_name).read();
+        except IOError as e:
+            raise Exception('Failed reading file [' + file_name + ']');
 
         file_content = file_content.replace(input_instruction[0], input_content);
 
