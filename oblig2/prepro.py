@@ -328,42 +328,42 @@ def process_inline_blocks(file_content, pretty=False):
     return file_content;
 
 def process_inline_fake(file_content, pretty=False):
-    """
-Identify inline code blocks to execute, execute it and print the code blocks.
+    r"""
+    Identify inline code blocks to execute, execute it and print the code blocks.
 
-Parameters
-----------
-file_content : str
-    The file_content to search for and replace placeholders in.
-pretty : bool
-    Whether to use fancy formatting or not"""
+    Parameters
+    ----------
+    file_content : str
+        The file_content to search for and replace placeholders in.
+    pretty : bool
+        Whether to use fancy formatting or not
+
+    >>> process_inline_fake('foobar\n%@bash fakescript.sh\necho 1337\n%@\nstuff\n%@python fakepython.py\nprint 1337\n%@\nmore stuff')
+    'foobar\n\\begin{verbatim}\n$ bash fakescript.sh \n1337\n\\end{verbatim}\n\nstuff\n\\begin{verbatim}\n$ python fakepython.py \n1337\n\\end{verbatim}\n\nmore stuff'
+    """
 
     # Find inline code blocks for execution
     blocks = re.findall(r'(%@(bash|python) (.*)\n((.*\n)+?)%@)', file_content, re.MULTILINE);
 
     for block in blocks:
-        if (block[1] == 'python'):
-            code_type    = block[1]; # python or bash
-            fake_command = block[2];
-            code_block   = block[3];
+        code_type    = block[1]; # python or bash
+        fake_command = block[2];
+        code_block   = block[3];
 
-            # Open a sub process for executing the code block
-            process   = subprocess.Popen([code_type, '-c', code_block], stdout=subprocess.PIPE);
+        # Open a sub process for executing the code block
+        process   = subprocess.Popen([code_type, '-c', code_block], stdout=subprocess.PIPE);
 
-            # Get the piped output and return
-            out, err = process.communicate();
+        # Get the piped output and return
+        out, err = process.communicate();
 
-            # Replace each statement with the script output in a verbatim block
-            file_content = file_content.replace(
-                block[0],
-                verbatim_exec(
-                    '$ %s %s \n%s' % (code_type, fake_command, out),
-                    pretty
-                )
-            );
-
-        #print block;
-        #print "\n\n"
+        # Replace each statement with the script output in a verbatim block
+        file_content = file_content.replace(
+            block[0],
+            verbatim_exec(
+                '$ %s %s \n%s' % (code_type, fake_command, out),
+                pretty
+            )
+        );
 
     return file_content;
 
