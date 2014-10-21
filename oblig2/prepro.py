@@ -404,22 +404,41 @@ def process_input_instructions(file_content):
 
 def process_file(input, output, verbose=False, pretty=False):
     """
-Process a latex file and augment it with source code, execution results and
-logic on top of plain old latex.
+    Process a latex file and augment it with source code, execution results and
+    logic on top of plain old latex.
 
-Parameters
-----------
-input : str
-    Path to the input file to process.
-output : str
-    Where to store the processed (and enriched) file.
-verbose : bool
-    Be loud about what to do.
-pretty : bool
-    Use fancy formatting for code blocks and output.
+    Parameters
+    ----------
+    input : str
+        Path to the input file to process.
+    output : str
+        Where to store the processed (and enriched) file.
+    verbose : bool
+        Be loud about what to do.
+    pretty : bool
+        Use fancy formatting for code blocks and output.
+
+    Test that exception is given if reading of input file fails
+    >>> process_file('./none-existant-input-file', 'test')
+    Traceback (most recent call last):
+    ...
+    Exception: Failed reading file [./none-existant-input-file]
+
+    Test that an exception is thrown when writing fails (in this case
+    by writing to a folder that does not exist)
+    >>> process_file('./tests/doctest-fixtures/tex_before.tex', './tmp/abc/test.tex')
+    Traceback (most recent call last):
+    ...
+    Exception: Failed writing file [./tmp/abc/test.tex]
+
+    Test that successfull pre-processing of latex file gives no output
+    >>> process_file('./tests/doctest-fixtures/tex_before.tex', './tmp/test.tex')
     """
 
-    file_content = open(input).read();
+    try:
+        file_content = open(input).read();
+    except IOError as e:
+        raise Exception('Failed reading file [' + input + ']');
 
     # Insert content of files referenced by \input instruction
     file_content = process_input_instructions(file_content);
@@ -441,9 +460,12 @@ pretty : bool
     file_content = process_inline_fake(file_content, pretty);
 
     # Write to output file
-    output_file = open(output, 'w');
-    output_file.write(file_content);
-    output_file.close();
+    try:
+        output_file = open(output, 'w');
+        output_file.write(file_content);
+        output_file.close();
+    except IOError as e:
+        raise Exception('Failed writing file [' + output + ']');
 
 
 # If-test to ensure code only executed if ran as stand-alone app.
