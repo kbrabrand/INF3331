@@ -5,75 +5,7 @@ import subprocess # Subprocess module
 import shlex      # Simple lexical analysis
 import argparse;  # Argument parsing tools
 
-verbatim_plain_pre =   '\\begin{verbatim}'
-verbatim_plain_post =  '\end{verbatim}\n'
-
-verbatim_code_pretty_pre =  ("\\begin{shadedquoteBlueBar}\n"
-                             "\\fontsize{9pt}{9pt}\n"
-                             "\\begin{Verbatim}\n");
-
-verbatim_code_pretty_post = ("\\end{Verbatim}\n"
-                             "\\end{shadedquoteBlueBar}\n"
-                             "\\noindent\n");
-
-verbatim_exec_pretty_pre =  "\\begin{Verbatim}[numbers=none,frame=lines,label=\\fbox{{\\tiny Terminal}},fontsize=\\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]"
-
-verbatim_exec_pretty_post = ("\\end{Verbatim}\n"
-                             "\\noindent\n");
-
-def verbatim_code(code, pretty=False):
-    r"""
-    Return code wrapped in verbatim block.
-
-    code : str
-        String of code to wrap in verbatim.
-    pretty : bool
-        Whether to use fancy formatting or not.
-
-    Test plain verbatim print
-    >>> verbatim_code("foobar")
-    '\\begin{verbatim}\nfoobar\\end{verbatim}\n'
-
-    Test fancy verbatim code print
-    >>> verbatim_code("foobar", pretty=True)
-    '\\begin{shadedquoteBlueBar}\n\\fontsize{9pt}{9pt}\n\\begin{Verbatim}\n\nfoobar\\end{Verbatim}\n\\end{shadedquoteBlueBar}\n\\noindent\n'
-    """
-
-    if (pretty):
-        before = verbatim_code_pretty_pre;
-        after  = verbatim_code_pretty_post;
-    else:
-        before = verbatim_plain_pre;
-        after  = verbatim_plain_post;
-
-    return before + '\n' + code + after;
-
-def verbatim_exec(result, pretty=False):
-    r"""
-    Return execution result wrapped in verbatim block.
-
-    result : str
-        String with output from execution to wrap in verbatim.
-    pretty : bool
-        Whether to use fancy formatting or not.
-
-    Test plain verbatim print
-    >>> verbatim_exec("foobar")
-    '\\begin{verbatim}\nfoobar\\end{verbatim}\n'
-
-    Test fancy verbatim exec result print
-    >>> verbatim_exec("foobar", pretty=True)
-    '\\begin{Verbatim}[numbers=none,frame=lines,label=\\fbox{{\\tiny Terminal}},fontsize=\\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]\nfoobar\\end{Verbatim}\n\\noindent\n'
-    """
-
-    if (pretty):
-        before = verbatim_exec_pretty_pre
-        after  = verbatim_exec_pretty_post;
-    else:
-        before = verbatim_plain_pre;
-        after  = verbatim_plain_post;
-
-    return before + '\n' + result + after;
+from src import verbatim;
 
 def add_pretty_print_block(file_content):
     r"""
@@ -234,7 +166,7 @@ def inject_source_code(file_content, pretty=False):
         # of the referenced file
         file_content = file_content.replace(
             import_statement,
-            verbatim_code(
+            verbatim.verbatim_code(
                 get_regex_match_in_file(import_file, import_regex),
                 pretty
             )
@@ -270,7 +202,7 @@ def inject_script_output(file_content, pretty=False):
         # Replace each statement with the script output in a verbatim block
         file_content = file_content.replace(
             exec_statement,
-            verbatim_exec(
+            verbatim.verbatim_exec(
                 '$ ' + exec_script + '\n' + get_exec_result(exec_script),
                 pretty
             )
@@ -309,9 +241,9 @@ def process_inline_blocks(file_content, pretty=False):
         inner_block = block[2];
 
         if (inner_block == "import"):
-            formatted_block = verbatim_code(inner_block, pretty);
+            formatted_block = verbatim.verbatim_code(inner_block, pretty);
         else:
-            formatted_block = verbatim_exec(inner_block, pretty);
+            formatted_block = verbatim.verbatim_exec(inner_block, pretty);
 
         file_content = file_content.replace(
             outer_block,
@@ -352,7 +284,7 @@ def process_inline_fake(file_content, pretty=False):
         # Replace each statement with the script output in a verbatim block
         file_content = file_content.replace(
             block[0],
-            verbatim_exec(
+            verbatim.verbatim_exec(
                 '$ %s %s \n%s' % (code_type, fake_command, out),
                 pretty
             )
