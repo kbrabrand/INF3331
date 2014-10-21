@@ -69,3 +69,7 @@ def verbatim_exec(result, pretty=False):
         after  = verbatim_plain_post;
 
     return before + '\n' + result + after;
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
