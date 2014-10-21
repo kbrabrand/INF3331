@@ -259,13 +259,6 @@ def inject_script_output(file_content, pretty=False):
     'foobar\n\\begin{verbatim}\n$ echo 1337\n1337\n\\end{verbatim}\n\n'
     """
 
-    if (pretty):
-        before = verbatim_exec_pretty_pre;
-        after  = verbatim_exec_pretty_post;
-    else:
-        before = verbatim_plain_pre;
-        after  = verbatim_plain_post;
-
     # Find all lines matching the exec statement format
     script_execs = re.findall(r'\n(%@exec (.*))\n', file_content);
 
