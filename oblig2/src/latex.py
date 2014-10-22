@@ -1,4 +1,6 @@
 import re;
+import os.path;
+import ntpath;
 
 def add_pretty_print_block(file_content):
     r"""
@@ -19,23 +21,23 @@ def add_pretty_print_block(file_content):
     '\\documentclass{article}\n\\usepackage{fancyvrb}\n\\usepackage{framed}\n\\usepackage{color}\n\\providecommand{\\shadedwbar}{}\n\\definecolor{shadecolor}{rgb}{0.87843, 0.95686, 1.0}\n\\renewenvironment{shadedwbar}{\n\\def\\FrameCommand{\\color[rgb]{0.7,     0.95686, 1}\\vrule width 1mm\\normalcolor\\colorbox{shadecolor}}\\FrameRule0.6pt\n\\MakeFramed {\\advance\\hsize-2mm\\FrameRestore}\\vskip3mm}{\\vskip0mm\\endMakeFramed}\n\\providecommand{\\shadedquoteBlueBar}{}\n\\renewenvironment{shadedquoteBlueBar}[1][]{\n\\bgroup\\rmfamily\n\\fboxsep=0mm\\relax\n\\begin{shadedwbar}\n\\list{}{\\parsep=-2mm\\parskip=0mm\\topsep=0pt\\leftmargin=2mm\n\\rightmargin=2\\leftmargin\\leftmargin=4pt\\relax}\n\\item\\relax}\n{\\endlist\\end{shadedwbar}\\egroup}\n\nstuff'
     """
 
-    pretty_print_setup = ("\usepackage{fancyvrb}\n"
-                          "\usepackage{framed}\n"
-                          "\usepackage{color}\n"
-                          "\providecommand{\shadedwbar}{}\n"
-                          "\definecolor{shadecolor}{rgb}{0.87843, 0.95686, 1.0}\n"
-                          "\\renewenvironment{shadedwbar}{\n"
-                          "\def\FrameCommand{\color[rgb]{0.7,     0.95686, 1}\\vrule width 1mm\\normalcolor\colorbox{shadecolor}}\FrameRule0.6pt\n"
-                          "\MakeFramed {\\advance\hsize-2mm\FrameRestore}\\vskip3mm}{\\vskip0mm\endMakeFramed}\n"
-                          "\providecommand{\shadedquoteBlueBar}{}\n"
-                          "\\renewenvironment{shadedquoteBlueBar}[1][]{\n"
-                          "\\bgroup\\rmfamily\n"
-                          "\\fboxsep=0mm\\relax\n"
-                          "\\begin{shadedwbar}\n"
-                          "\list{}{\parsep=-2mm\parskip=0mm\\topsep=0pt\leftmargin=2mm\n"
-                          "\\rightmargin=2\leftmargin\leftmargin=4pt\\relax}\n"
-                          "\item\\relax}\n"
-                          "{\endlist\end{shadedwbar}\egroup}\n");
+    pretty_print_setup =    ("\usepackage{fancyvrb}\n"
+                            "\usepackage{framed}\n"
+                            "\usepackage{color}\n"
+                            "\providecommand{\shadedwbar}{}\n"
+                            "\definecolor{shadecolor}{rgb}{0.87843, 0.95686, 1.0}\n"
+                            "\\renewenvironment{shadedwbar}{\n"
+                            "\def\FrameCommand{\color[rgb]{0.7,     0.95686, 1}\\vrule width 1mm\\normalcolor\colorbox{shadecolor}}\FrameRule0.6pt\n"
+                            "\MakeFramed {\\advance\hsize-2mm\FrameRestore}\\vskip3mm}{\\vskip0mm\endMakeFramed}\n"
+                            "\providecommand{\shadedquoteBlueBar}{}\n"
+                            "\\renewenvironment{shadedquoteBlueBar}[1][]{\n"
+                            "\\bgroup\\rmfamily\n"
+                            "\\fboxsep=0mm\\relax\n"
+                            "\\begin{shadedwbar}\n"
+                            "\list{}{\parsep=-2mm\parskip=0mm\\topsep=0pt\leftmargin=2mm\n"
+                            "\\rightmargin=2\leftmargin\leftmargin=4pt\\relax}\n"
+                            "\item\\relax}\n"
+                            "{\endlist\end{shadedwbar}\egroup}\n");
 
     match = re.search(r'(\\documentclass{.*})', file_content);
 
@@ -47,7 +49,7 @@ def add_pretty_print_block(file_content):
     else:
         raise Exception('No documentclass found');
 
-def process_input_instructions(file_content):
+def process_input_instructions(file_content, base_path=''):
     r"""
     Identify latex input instructions and replace them with the actual instructions
     from the referenced files.
@@ -71,12 +73,20 @@ def process_input_instructions(file_content):
     input_instructions = re.findall(r'(\\input{(.*)})', file_content);
 
     for input_instruction in input_instructions:
-        file_name = input_instruction[1];
+        file_path = input_instruction[1];
+        file_base = ntpath.split(file_path)[0];
+
+        if base_path != '':
+            file_path = os.path.join(base_path, file_path);
+            file_base = ntpath.split(file_path)[0];
 
         try:
-            input_content = open(file_name).read();
+            input_content = process_input_instructions(
+                open(file_path).read(),
+                file_base
+            );
         except IOError as e:
-            raise Exception('Failed reading file [' + file_name + ']');
+            raise Exception('Failed reading file [' + file_path + ']');
 
         file_content = file_content.replace(input_instruction[0], input_content);
 
