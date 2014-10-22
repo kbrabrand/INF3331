@@ -7,9 +7,18 @@ def add_pretty_print_block(file_content):
     Add instructions for setting up pretty printing of source code and execution
     results after the documentclass instruction.
 
+    Parameters
+    ----------
     file_content : str
         The file_content to add the instructions to.
 
+    Returns
+    -------
+    file_content : str
+        Augmented file content
+
+    Example
+    -------
     Test adding pretty print instructions to document missing documentclass
     >>> add_pretty_print_block('1337 bits of rubbish');
     Traceback (most recent call last):
@@ -58,7 +67,16 @@ def process_input_instructions(file_content, base_path=''):
     ----------
     file_content : str
         The file_content to add the instructions to.
+    base_path : str
+        Base path that the input paths are relative to
 
+    Returns
+    -------
+    file_content : str
+        Augmented file content
+
+    Example
+    -------
     Test that exception is thrown when a non-existant file is provided for input
     >>> process_input_instructions('foo\n\input{./non-existant-file}\nmore stuff')
     Traceback (most recent call last):
