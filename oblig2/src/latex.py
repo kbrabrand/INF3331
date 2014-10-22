@@ -1,6 +1,5 @@
 import re;
 import os.path;
-import ntpath;
 
 def add_pretty_print_block(file_content):
     r"""
@@ -92,11 +91,11 @@ def process_input_instructions(file_content, base_path=''):
 
     for input_instruction in input_instructions:
         file_path = input_instruction[1];
-        file_base = ntpath.split(file_path)[0];
+        file_base = os.path.split(file_path)[0];
 
         if base_path != '':
             file_path = os.path.join(base_path, file_path);
-            file_base = ntpath.split(file_path)[0];
+            file_base = os.path.split(file_path)[0];
 
         try:
             input_content = process_input_instructions(
