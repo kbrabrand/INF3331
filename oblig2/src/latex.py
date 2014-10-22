@@ -85,7 +85,7 @@ def process_input_instructions(file_content, base_path=''):
 
     Test that a valid file referenced with an input statement is injected
     >>> process_input_instructions('foo\n\input{../tests/doctest-fixtures/abc.tex}\nstuff');
-    'foo\nhei\nstuff'
+    'foo\nhei\n\n1337\n\nstuff'
     """
 
     input_instructions = re.findall(r'(\\input{(.*)})', file_content);
