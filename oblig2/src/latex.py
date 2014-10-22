@@ -1,5 +1,6 @@
 import re;
 import os.path;
+import prepro;
 
 def add_pretty_print_block(file_content):
     r"""
@@ -57,7 +58,7 @@ def add_pretty_print_block(file_content):
     else:
         raise Exception('No documentclass found');
 
-def process_input_instructions(file_content, base_path=''):
+def process_input_instructions(file_content, verbose=False, pretty=False, base_path=''):
     r"""
     Identify latex input instructions and replace them with the actual instructions
     from the referenced files.
@@ -66,6 +67,10 @@ def process_input_instructions(file_content, base_path=''):
     ----------
     file_content : str
         The file_content to add the instructions to.
+    verbose : bool
+        Be loud about what to do.
+    pretty : bool
+        Use fancy formatting for code blocks and output.
     base_path : str
         Base path that the input paths are relative to
 
@@ -98,8 +103,11 @@ def process_input_instructions(file_content, base_path=''):
             file_base = os.path.split(file_path)[0];
 
         try:
-            input_content = process_input_instructions(
+            # Process the input file
+            input_content = prepro.process_content(
                 open(file_path).read(),
+                verbose,
+                pretty,
                 file_base
             );
         except IOError as e:

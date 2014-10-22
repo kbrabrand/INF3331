@@ -1,4 +1,5 @@
 import re;
+import os.path;
 import verbatim;
 
 def get_regex_match_in_file(file, regex):
@@ -12,6 +13,13 @@ def get_regex_match_in_file(file, regex):
     regex : str
         Regex to match for in the file.
 
+    Returns
+    -------
+    file_content : str
+        Augmented file content
+
+    Example
+    -------
     Match patterin in this file (valid file + content that exist)
     >>> get_regex_match_in_file('./code_import.py', '(def get_regex(.*))+')
     'def get_regex_match_in_file(file, regex):'
@@ -41,7 +49,7 @@ def get_regex_match_in_file(file, regex):
     else:
         return match[0][0];
 
-def inject_source_code(file_content, pretty=False):
+def inject_source_code(file_content, pretty=False, base_path=''):
     r"""
     Replace all "%@ import..." statements in the latex file with the source code
     it refers to.
@@ -52,7 +60,16 @@ def inject_source_code(file_content, pretty=False):
         The file_content to search for and replace placeholders in.
     pretty : bool
         Whether or not to use fancy formatting.
+    base_path : str
+        Base path that the input paths are relative to
 
+    Returns
+    -------
+    file_content : str
+        Augmented file content
+
+    Example
+    -------
     Test that the input string is returned when there's no match
     >>> inject_source_code('a few words')
     'a few words'
@@ -72,15 +89,21 @@ def inject_source_code(file_content, pretty=False):
     # For each import statement
     for source_import in source_imports:
         import_statement = source_import[0];
-        import_file      = source_import[1];
         import_regex     = source_import[2];
+
+        file_path = source_import[1];
+        file_base = os.path.split(file_path)[0];
+
+        if base_path != '':
+            file_path = os.path.join(base_path, file_path);
+            file_base = os.path.split(file_path)[0];
 
         # Replace import statement with the matched portion
         # of the referenced file
         file_content = file_content.replace(
             import_statement,
             verbatim.verbatim_code(
-                get_regex_match_in_file(import_file, import_regex),
+                get_regex_match_in_file(file_path, import_regex),
                 pretty
             )
         );
