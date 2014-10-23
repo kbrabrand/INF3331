@@ -1,0 +1,19 @@
+\section*{Oppgave 3: Kodeformatering}
+
+Kodeformateringen i oppgaven håndteres med verbatim-blokker i det ferdige latex-dokumentet. Ettersom dette er noe som brukes av nesten alle modulene har jeg valgt å skille ut denne logikken i egne metoder; verbatim\_exec og verbatim\_code i verbatim-modulen.
+
+Ved å kalle disse uten pretty-parametert (eller med parameteret satt til False) omsluttes stringen som sendes inn i metodenen som første parameter (navngitt hhv. code og result) av instruksjoner som gir en enkel vebatim-blokk.
+
+Ved å sende med True for pretty-parametert gis det en litt stiligere verbatim-blokk.
+
+Verbatim-metodene kan brukes slik;
+
+%@import
+# Fancy verbatim exec
+print verbatim_exec('echo 2', pretty=True);
+
+# Plain verbatim code
+print verbatim_code('print 2');
+%@
+
+Kodeformatering gjøres som del av de ulike leddene i prosesseringen som gjøres når prepro.py kjøres på en latex-fil. Implementasjonen finnes i src/verbatim.py.

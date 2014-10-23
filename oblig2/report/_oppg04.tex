@@ -1,0 +1,13 @@
+\section*{Oppgave 4: Vanlig innliming av kode}
+
+I denne oppgaven bruker jeg i likhet med de fleste andre verbatim-modulen for formatering. Denne oppgaven ble med dette redusert til å gjøre en multiline-regex for å finne kodeblokker og deretter kalle på \verb;verbatim.verbatim_code; eller \verb;verbatim.verbatim_exec; avhengig av om det var en \verb;%import;- eller \verb;\%@exec;-instruksjon.
+
+Jeg bruker dette regulære uttrykket for å finne kode som er limt inn.
+
+%@import
+(%@(import|exec)\n((.*\n)+?)%@)
+%@
+
+Når uttrykket matches mot teksten gir det en gruppe med nøkkelordet (import eller exec) i, og jeg bruker dette til å finne ut om jeg skal pakke linjene mellom start og sluttaggen i code- eller exec-verbatim.
+
+Formatering av innlimt kode er et av leddene i prosesseringen som gjøres når prepro.py kjøres på en latex-fil. Implementasjonen finnes i src/inline\_blocks.py.

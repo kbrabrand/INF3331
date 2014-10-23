@@ -1,0 +1,11 @@
+\section*{Oppgave 2: Eksekvering av script}
+
+I denne oppgaven skjer matchingen på samme måte som i forrige oppgave, men når et treff for mønsterest er funnet kjøres kommandoen og resultatet av kjøringen settes inn i dokumentet.
+
+Selve kjøringen av kommandoen gjøres ved hjelp av \verb;subprocess;-modulen og jeg bruker \verb;shlex;-modulen for å splitte kommando-parametrene til et array med parametre som \verb;subprocess.Popen; er fornøyd med.
+
+Koden nedenfor er det som skal til for å splitte en kommando-string til et array med parametre, kjøre denne og returnere output;
+
+%@import ../src/script_execution.py (.*# Parse/split the command(.|\n)+return out;)+
+
+Eksekvering av scripts skjer som en del av prosesseringen som gjøres når prepro.py kjøres på en latex-fil. Implementasjonen finnes i src/script\_execution.py.

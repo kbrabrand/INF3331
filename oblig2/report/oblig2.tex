@@ -1,0 +1,57 @@
+\documentclass{article}
+
+\usepackage{fancyvrb}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\title{Obligatorisk innlevering 2, høsten 2014, INF3331}
+\author{Kristoffer Brabrand <kristrek@student.matnat.uio.no>}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Innledende beskrivelse}
+
+Omfanget av denne oppgaven er vesentlig større enn forrige oppgave, og jeg vil nedenfor redegjøre i korte trekk for flyten i prepro.py for å gjøre det litt klarere hva som skjer.
+
+\begin{enumerate}
+  \item Parsing av kommandolinjeparametre.
+  \item Sjekker at inputfilen finnes og laster filen.
+  \item Legger til instruksjoner nødvendig for pretty-printing (hvis pretty-printing er aktivert).
+  \item Prosessering av innholdet i filen.
+  \begin{enumerate}
+  	\item Erstatter alle \\input-instruksjoner med filen de referer til og prosesserer den inkluderte filen som beskrevet i pkt. 1 m/ underpunkter (rekursjon).
+  	\item Setter inn kildekode referert til med \verb;%@import;.
+  	\item Setter inn eksekveringsresultat referert til med \verb;%@exex;.
+  	\item Setter inn inline-kode referert til med \verb;%@import; eller \verb;%@exec;.
+  	\item Setter inn eksekveringsresultat av inline kode refert til med \verb;\%@bash; eller \verb;%@python;.
+  \end{enumerate}
+  \item Skriv den bearbeidede filen til den spesifiserte output-filen.
+\end{enumerate}
+
+Parametrene prepro.py tar vises enklest ved å kalle den med -h som parameter. Outputen som gis når man kaller \verb;prepro.py -h; er vist nedenfor.
+
+%@exec python prepro.py -h
+
+\input{_oppg01.tex}
+
+\input{_oppg02.tex}
+
+\input{_oppg03.tex}
+
+\input{_oppg04.tex}
+
+\input{_oppg05.tex}
+
+\input{_oppg07.tex}
+
+\input{_oppg08.tex}
+
+\input{_oppg11.tex}
+
+\input{_oppg12.tex}
+
+\input{_oppg13.tex}
+
+\end{document}

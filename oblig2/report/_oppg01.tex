@@ -1,0 +1,13 @@
+\section*{Oppgave 1: Kodeimport}
+
+Oppgaven er løst ved bruk av et regulært uttrykk som går over flere linjer. Den ser etter et innledende linjeskift før mønsteret for kodeimporten og deretter én eller flere linjer før avslutningstaggen.
+
+Jeg har brukt følgende mønster for å matche kodeimport-instruksjoner;
+
+%@import
+\n(%@import ([^\ ]+) (.*))\n
+%@
+
+Når mønsteret er funnet i latex-dokumentet blir innholdet i filen det referers til kjørt mot det regulære uttrykket, og det første treffet på dette blir returnert.
+
+Kodeimporten gjøres som en del prosesseringen som gjøres når \verb;prepro.py; kjøres på en latex-fil. Implementasjonen finnes i src/code\_import.py.

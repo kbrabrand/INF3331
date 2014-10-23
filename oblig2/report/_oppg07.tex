@@ -1,0 +1,10 @@
+\section*{Oppgave 7: Kompilering av preprosessert fil}
+
+Kompilatoren er så begrenset i omfang at jeg valgte å implementere den som én enkelt fil. Kompilatoren starter en subprosess av \verb;pdflatex; ved hjelp av \verb;subprocess.Popen;
+
+Som standard kjøres \verb;pdflatex; i nonstopmode ved at interaction-flagget settes til nonstopmode. Dette kan deaktiveres ved å sette interactive-flagget når compile.py-scriptet kalles.
+Output fra compile.py går – som i \verb;pdflatex; – som standard til den samme mappen som latex-filen som prosesseres ligger i. Dette kan overstyres ved å kalle compile.py med et destination-parameter.
+
+Alle parametre til compile.py vises enkelt ved å kalle \verb;python compile.py -h;. Dette gir følende output;
+
+%@exec python compile.py -h

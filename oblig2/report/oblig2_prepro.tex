@@ -1,0 +1,286 @@
+\documentclass{article}
+\usepackage{fancyvrb}
+\usepackage{framed}
+\usepackage{color}
+\providecommand{\shadedwbar}{}
+\definecolor{shadecolor}{rgb}{0.87843, 0.95686, 1.0}
+\renewenvironment{shadedwbar}{
+\def\FrameCommand{\color[rgb]{0.7,     0.95686, 1}\vrule width 1mm\normalcolor\colorbox{shadecolor}}\FrameRule0.6pt
+\MakeFramed {\advance\hsize-2mm\FrameRestore}\vskip3mm}{\vskip0mm\endMakeFramed}
+\providecommand{\shadedquoteBlueBar}{}
+\renewenvironment{shadedquoteBlueBar}[1][]{
+\bgroup\rmfamily
+\fboxsep=0mm\relax
+\begin{shadedwbar}
+\list{}{\parsep=-2mm\parskip=0mm\topsep=0pt\leftmargin=2mm
+\rightmargin=2\leftmargin\leftmargin=4pt\relax}
+\item\relax}
+{\endlist\end{shadedwbar}\egroup}
+
+
+\usepackage{fancyvrb}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\title{Obligatorisk innlevering 2, høsten 2014, INF3331}
+\author{Kristoffer Brabrand <kristrek@student.matnat.uio.no>}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Innledende beskrivelse}
+
+Omfanget av denne oppgaven er vesentlig større enn forrige oppgave, og jeg vil nedenfor redegjøre i korte trekk for flyten i prepro.py for å gjøre det litt klarere hva som skjer.
+
+\begin{enumerate}
+  \item Parsing av kommandolinjeparametre.
+  \item Sjekker at inputfilen finnes og laster filen.
+  \item Legger til instruksjoner nødvendig for pretty-printing (hvis pretty-printing er aktivert).
+  \item Prosessering av innholdet i filen.
+  \begin{enumerate}
+  	\item Erstatter alle \\input-instruksjoner med filen de referer til og prosesserer den inkluderte filen som beskrevet i pkt. 1 m/ underpunkter (rekursjon).
+  	\item Setter inn kildekode referert til med \verb;%@import;.
+  	\item Setter inn eksekveringsresultat referert til med \verb;%@exex;.
+  	\item Setter inn inline-kode referert til med \verb;%@import; eller \verb;%@exec;.
+  	\item Setter inn eksekveringsresultat av inline kode refert til med \verb;\%@bash; eller \verb;%@python;.
+  \end{enumerate}
+  \item Skriv den bearbeidede filen til den spesifiserte output-filen.
+\end{enumerate}
+
+Parametrene prepro.py tar vises enklest ved å kalle den med -h som parameter. Outputen som gis når man kaller \verb;prepro.py -h; er vist nedenfor.
+
+\begin{Verbatim}[numbers=none,frame=lines,label=\fbox{{\tiny Terminal}},fontsize=\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]
+$ python prepro.py -h
+usage: prepro.py [-h] [--pretty] [--verbose] source dest
+
+Preprocess latex file.
+
+positional arguments:
+  source         Path to preprocess source file
+  dest           Destination folder for the processed file
+
+optional arguments:
+  -h, --help     show this help message and exit
+  --pretty, -p   Enable fancy verbatims
+  --verbose, -v  Enable verbose script output
+\end{Verbatim}
+\noindent
+
+
+\section*{Oppgave 1: Kodeimport}
+
+Oppgaven er løst ved bruk av et regulært uttrykk som går over flere linjer. Den ser etter et innledende linjeskift før mønsteret for kodeimporten og deretter én eller flere linjer før avslutningstaggen.
+
+Jeg har brukt følgende mønster for å matche kodeimport-instruksjoner;
+
+\begin{shadedquoteBlueBar}
+\fontsize{9pt}{9pt}
+\begin{Verbatim}
+
+\n(%@import ([^\ ]+) (.*))\n
+\end{Verbatim}
+\end{shadedquoteBlueBar}
+\noindent
+
+
+Når mønsteret er funnet i latex-dokumentet blir innholdet i filen det referers til kjørt mot det regulære uttrykket, og det første treffet på dette blir returnert.
+
+Kodeimporten gjøres som en del prosesseringen som gjøres når \verb;prepro.py; kjøres på en latex-fil. Implementasjonen finnes i src/code\_import.py.
+
+\section*{Oppgave 2: Eksekvering av script}
+
+I denne oppgaven skjer matchingen på samme måte som i forrige oppgave, men når et treff for mønsterest er funnet kjøres kommandoen og resultatet av kjøringen settes inn i dokumentet.
+
+Selve kjøringen av kommandoen gjøres ved hjelp av \verb;subprocess;-modulen og jeg bruker \verb;shlex;-modulen for å splitte kommando-parametrene til et array med parametre som \verb;subprocess.Popen; er fornøyd med.
+
+Koden nedenfor er det som skal til for å splitte en kommando-string til et array med parametre, kjøre denne og returnere output;
+
+\begin{shadedquoteBlueBar}
+\fontsize{9pt}{9pt}
+\begin{Verbatim}
+
+    # Parse/split the command into arguments
+    arguments = shlex.split(command);
+
+    try:
+        # Open a sub process with the arguments
+        process   = subprocess.Popen(arguments, stdout=subprocess.PIPE);
+
+        # Get the piped output and return
+        out, err = process.communicate();
+    except OSError as e:
+        raise Exception('Execution of command failed');
+
+    return out;\end{Verbatim}
+\end{shadedquoteBlueBar}
+\noindent
+
+
+Eksekvering av scripts skjer som en del av prosesseringen som gjøres når prepro.py kjøres på en latex-fil. Implementasjonen finnes i src/script\_execution.py.
+
+\section*{Oppgave 3: Kodeformatering}
+
+Kodeformateringen i oppgaven håndteres med verbatim-blokker i det ferdige latex-dokumentet. Ettersom dette er noe som brukes av nesten alle modulene har jeg valgt å skille ut denne logikken i egne metoder; verbatim\_exec og verbatim\_code i verbatim-modulen.
+
+Ved å kalle disse uten pretty-parametert (eller med parameteret satt til False) omsluttes stringen som sendes inn i metodenen som første parameter (navngitt hhv. code og result) av instruksjoner som gir en enkel vebatim-blokk.
+
+Ved å sende med True for pretty-parametert gis det en litt stiligere verbatim-blokk.
+
+Verbatim-metodene kan brukes slik;
+
+\begin{shadedquoteBlueBar}
+\fontsize{9pt}{9pt}
+\begin{Verbatim}
+
+# Fancy verbatim exec
+print verbatim_exec('echo 2', pretty=True);
+
+# Plain verbatim code
+print verbatim_code('print 2');
+\end{Verbatim}
+\end{shadedquoteBlueBar}
+\noindent
+
+
+Kodeformatering gjøres som del av de ulike leddene i prosesseringen som gjøres når prepro.py kjøres på en latex-fil. Implementasjonen finnes i src/verbatim.py.
+
+\section*{Oppgave 4: Vanlig innliming av kode}
+
+I denne oppgaven bruker jeg i likhet med de fleste andre verbatim-modulen for formatering. Denne oppgaven ble med dette redusert til å gjøre en multiline-regex for å finne kodeblokker og deretter kalle på \verb;verbatim.verbatim_code; eller \verb;verbatim.verbatim_exec; avhengig av om det var en \verb;%import;- eller \verb;\%@exec;-instruksjon.
+
+Jeg bruker dette regulære uttrykket for å finne kode som er limt inn.
+
+\begin{shadedquoteBlueBar}
+\fontsize{9pt}{9pt}
+\begin{Verbatim}
+
+(%@(import|exec)\n((.*\n)+?)%@)
+\end{Verbatim}
+\end{shadedquoteBlueBar}
+\noindent
+
+
+Når uttrykket matches mot teksten gir det en gruppe med nøkkelordet (import eller exec) i, og jeg bruker dette til å finne ut om jeg skal pakke linjene mellom start og sluttaggen i code- eller exec-verbatim.
+
+Formatering av innlimt kode er et av leddene i prosesseringen som gjøres når prepro.py kjøres på en latex-fil. Implementasjonen finnes i src/inline\_blocks.py.
+
+\section*{Oppgave 5: Kode-eksekvering}
+
+Jeg har løst denne oppgaven ved å først matche alle blokker med kode i teksten. Dette regulære uttrykket lignet mye på det som ble brukt i oppgave 4, men denne gangen med ytterligere én gruppe som inneholder scriptnavnet og evt. parametre vi vil det skal se ut som om vi har kjørt.
+
+Implementasjonen støtter seg på subprocess.Popen for å starte en subprosess. Kommandoen som brukes for å kjøre python- og bashkoden er \verb;bash -c 'kode her..'; og \verb;python -c 'kode her...';.
+
+Output fra stdout pipes og process.communicate() brukes for å få tak i innholdet. Til slutt pakkes det hele inn i en verbatim-blokk ved bruk av \verb;verbatim_exec; fra verbatim-modulen.
+
+Formatering av innlimt kode er et av leddene i prosesseringen som gjøres når prepro.py kjøres på en latex-fil. Implementasjonen finnes i src/inline\_blocks.py.
+
+\section*{Oppgave 7: Kompilering av preprosessert fil}
+
+Kompilatoren er så begrenset i omfang at jeg valgte å implementere den som én enkelt fil. Kompilatoren starter en subprosess av \verb;pdflatex; ved hjelp av \verb;subprocess.Popen;
+
+Som standard kjøres \verb;pdflatex; i nonstopmode ved at interaction-flagget settes til nonstopmode. Dette kan deaktiveres ved å sette interactive-flagget når compile.py-scriptet kalles.
+Output fra compile.py går – som i \verb;pdflatex; – som standard til den samme mappen som latex-filen som prosesseres ligger i. Dette kan overstyres ved å kalle compile.py med et destination-parameter.
+
+Alle parametre til compile.py vises enkelt ved å kalle \verb;python compile.py -h;. Dette gir følende output;
+
+\begin{Verbatim}[numbers=none,frame=lines,label=\fbox{{\tiny Terminal}},fontsize=\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]
+$ python compile.py -h
+usage: compile.py [-h] [--interactive] [--destination D] [--verbose] S
+
+Compile PDF from latex file.
+
+positional arguments:
+  S                     Latex source file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --interactive, -i     Interact with the latex compiler
+  --destination D, -d D
+                        Path to where the compiled file should be put
+  --verbose, -v         Enable verbose script output
+\end{Verbatim}
+\noindent
+
+
+\section*{Oppgave 8: Inkludering av filer}
+
+Oppgaven går i korte trekk ut på å gjenskape latex sin enkle \\input-funksjonalitet – denne går ut på å putte innholdet fra en fil inn i en annen. Disse instruksjonene matches med et regulært uttrykk, og filnavnet trekkes ut slik at innholdet kan puttes inn i filen som inkluderer den.
+
+Et problem som oppstår så fort man ikke har alle filene i én mappe er at relative stier blir feil hvis en fil inneholder en relativ sti og legges inn i en fil som lå på et annet nivå. For å løse dette sender jeg stien til filen som inkluderer som \verb;base_path; slik at filer som blir inkludert har en referanse til hvor de lå før de ble slått sammen.
+
+For å håndtere uthenting av mappesti for filer og sammenslåing av relative stier og base\_path har jeg brukt \verb;os.path;.
+
+Inkludering av filer er det første leddet i prosesseringen som gjøres når prepro.py kjøres på en latex-fil. Hele preprosesseringen kjøres for hver fil som inkluderes, slik at alle instruksjoner i alle inkluderte filer blir utført slik brukeren forventer. Implementasjonen finnes i src/latex.py.
+
+\section*{Oppgave 11: Front-end til preprosessor}
+
+Denne oppgaven er løst og vist som en del av de andre oppgavene. Man kan se det \"brukervennlige\" grensesnittet ved å kalle \verb;prepro.py; og \verb;compile.py; med parameteret -h. Slik;
+
+\begin{Verbatim}[numbers=none,frame=lines,label=\fbox{{\tiny Terminal}},fontsize=\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]
+$ python prepro.py -h
+usage: prepro.py [-h] [--pretty] [--verbose] source dest
+
+Preprocess latex file.
+
+positional arguments:
+  source         Path to preprocess source file
+  dest           Destination folder for the processed file
+
+optional arguments:
+  -h, --help     show this help message and exit
+  --pretty, -p   Enable fancy verbatims
+  --verbose, -v  Enable verbose script output
+\end{Verbatim}
+\noindent
+
+
+og
+
+\begin{Verbatim}[numbers=none,frame=lines,label=\fbox{{\tiny Terminal}},fontsize=\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]
+$ python compile.py -h
+usage: compile.py [-h] [--interactive] [--destination D] [--verbose] S
+
+Compile PDF from latex file.
+
+positional arguments:
+  S                     Latex source file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --interactive, -i     Interact with the latex compiler
+  --destination D, -d D
+                        Path to where the compiled file should be put
+  --verbose, -v         Enable verbose script output
+\end{Verbatim}
+\noindent
+
+
+
+
+\section*{Oppgave 12: Testing og dokumentasjon}
+
+Samtlige interne funksjoner i preprosessoren er testet med doctester som tester forventet respons, og \verb;exceptions; dersom gal/ugyldig input gis til metodene.
+
+Doctestene kan kjøres ved å navigere inn i src-mappen og kjøre hver enkelt modul slik; \verb;python code_import.py;.
+
+Test suiten krever \verb;nose;, og kjøres ved å utføre følgende kommando i roten av mappen oblig2;
+
+\begin{Verbatim}[numbers=none,frame=lines,label=\fbox{{\tiny Terminal}},fontsize=\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]
+nosetests
+\end{Verbatim}
+\noindent
+
+
+\section*{Oppgave 13: Rapport}
+
+Du har lest rapporten nå. Hvis du har lyst til å generere den kan du kjøre følgende kommando fra roten av oblig2;
+
+\begin{Verbatim}[numbers=none,frame=lines,label=\fbox{{\tiny Terminal}},fontsize=\fontsize{9pt}{9pt},labelposition=topline,framesep=2.5mm,framerule=0.7pt]
+ python prepro.py --pretty report/oblig2.tex report/oblig2_prepro.tex
+ python compile.py report/oblig2_prepro.py
+\end{Verbatim}
+\noindent
+
+
+\end{document}

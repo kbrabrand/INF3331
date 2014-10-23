@@ -1,0 +1,9 @@
+\section*{Oppgave 8: Inkludering av filer}
+
+Oppgaven går i korte trekk ut på å gjenskape latex sin enkle \\input-funksjonalitet – denne går ut på å putte innholdet fra en fil inn i en annen. Disse instruksjonene matches med et regulært uttrykk, og filnavnet trekkes ut slik at innholdet kan puttes inn i filen som inkluderer den.
+
+Et problem som oppstår så fort man ikke har alle filene i én mappe er at relative stier blir feil hvis en fil inneholder en relativ sti og legges inn i en fil som lå på et annet nivå. For å løse dette sender jeg stien til filen som inkluderer som \verb;base_path; slik at filer som blir inkludert har en referanse til hvor de lå før de ble slått sammen.
+
+For å håndtere uthenting av mappesti for filer og sammenslåing av relative stier og base\_path har jeg brukt \verb;os.path;.
+
+Inkludering av filer er det første leddet i prosesseringen som gjøres når prepro.py kjøres på en latex-fil. Hele preprosesseringen kjøres for hver fil som inkluderes, slik at alle instruksjoner i alle inkluderte filer blir utført slik brukeren forventer. Implementasjonen finnes i src/latex.py.

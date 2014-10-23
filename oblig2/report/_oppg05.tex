@@ -1,0 +1,9 @@
+\section*{Oppgave 5: Kode-eksekvering}
+
+Jeg har løst denne oppgaven ved å først matche alle blokker med kode i teksten. Dette regulære uttrykket lignet mye på det som ble brukt i oppgave 4, men denne gangen med ytterligere én gruppe som inneholder scriptnavnet og evt. parametre vi vil det skal se ut som om vi har kjørt.
+
+Implementasjonen støtter seg på subprocess.Popen for å starte en subprosess. Kommandoen som brukes for å kjøre python- og bashkoden er \verb;bash -c 'kode her..'; og \verb;python -c 'kode her...';.
+
+Output fra stdout pipes og process.communicate() brukes for å få tak i innholdet. Til slutt pakkes det hele inn i en verbatim-blokk ved bruk av \verb;verbatim_exec; fra verbatim-modulen.
+
+Formatering av innlimt kode er et av leddene i prosesseringen som gjøres når prepro.py kjøres på en latex-fil. Implementasjonen finnes i src/inline\_blocks.py.
