@@ -32,7 +32,7 @@ def process_blocks(file_content, pretty=False):
         block_type  = block[1];
         inner_block = block[2];
 
-        if (inner_block == "import"):
+        if (block_type == "import"):
             formatted_block = verbatim.verbatim_code(inner_block, pretty);
         else:
             formatted_block = verbatim.verbatim_exec(inner_block, pretty);
