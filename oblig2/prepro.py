@@ -8,7 +8,7 @@ if __name__ == "__main__":
     import doctest
     doctest.testmod()
 
-    parser = argparse.ArgumentParser(description='Compile PDF from latex file.');
+    parser = argparse.ArgumentParser(description='Preprocess latex file.');
 
     parser.add_argument('source',  metavar='source', help='Path to preprocess source file');
 
@@ -16,7 +16,7 @@ if __name__ == "__main__":
                         help='Destination folder for the processed file');
 
     parser.add_argument('--pretty', '-p', dest='pretty', help="Enable fancy verbatims",
-                        action='store_true', default=True);
+                        action='store_true', default=False);
 
     parser.add_argument('--verbose', '-v', dest='verbose',
                         help="Enable verbose script output", action='store_true');
