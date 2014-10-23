@@ -42,12 +42,14 @@ class TestScriptExecution(unittest.TestCase):
         );
 
         # Run the preprocessor on the input file
-        subprocess.Popen([
+        process = subprocess.Popen([
             'python',
             self.prepro_path,
             input_file,
             self.output_file
-        ]);
+        ], stdout=subprocess.PIPE);
+
+        out, err = process.communicate();
 
         # Verify that the output file is equal to the expected output
         self.assertTrue(open(expected_file).read() == open(self.output_file).read());

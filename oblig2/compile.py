@@ -59,13 +59,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Compile PDF from latex file.');
 
     parser.add_argument('--interactive', '-i', dest='interactive', help="Interact with the latex compiler", action='store_true');
-    
+
     parser.add_argument('source',  metavar='S', help='Latex source file');
-    
+
     parser.add_argument('--destination', '-d', metavar='D',
                         dest='destination', help='Path to where the compiled file should be put',
                         default=False);
-    
+
     parser.add_argument('--verbose', '-v', dest='verbose', help="Enable verbose script output", action='store_true');
 
     args = parser.parse_args();
