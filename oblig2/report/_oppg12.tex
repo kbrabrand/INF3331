@@ -9,3 +9,8 @@ Test suiten krever \verb;nose;, og kjøres ved å utføre følgende kommando i r
 %@exec
 nosetests
 %@
+
+\subsection*{Testing av compiler}
+For å verifisere at compileren virker skulle jeg ideelt sett ha testet at output var den samme hver gang gjennom å hente ut en md5 sum eller sammenligne innhold. Det er imidlertid ikke mulig da to kompileringer (med pdflatex) av samme fil ikke gir samme innhold, og dermed ikke samme md5-sum.
+
+Jeg har derfor valgt å redusere testen til at en pdf-fil blir generert, ettersom dette tyder på vellykket kompilering.
