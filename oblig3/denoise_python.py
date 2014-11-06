@@ -3,20 +3,33 @@
 import argparse;
 from PIL import Image;
 
-def denoise_image_data(data, width, height, kappa=1, iterations=1):
-    # Create an array for the denoised data
-    denoised_data = [None] * (width * height);
+from denoise_shared import restricted_float, valid_file;
 
-    source = data;
-    target = denoised_data;
+def restricted_float(x):
+    x = float(x);
+
+    if x < 0.0 or x > 1.0:
+        raise argparse.ArgumentTypeError("%r not in range [0.0, 1.0]"%(x,));
+
+    return x;
+
+def denoise_image_data(data0, width, height, kappa=1, iterations=1):
+    data = {
+        'd0' : data0,                    # Input data array
+        'd1' : [None] * (width * height) # Same-sized array
+    };
+
+    # Set both source and target to d0 now, to accound for
+    # the unlikely edge case where we're doing no iterations.
+    # Setting the target to d1 right away would then cause
+    # the array filled with Nones to be returned, which is
+    # not the desired behaviour (should return the input data).
+    source = data['d0'];
+    target = data['d0'];
 
     for i in range(iterations):
-        if i%2 == 0:
-            source = data;
-            target = denoised_data;
-        else:
-            target = data;
-            source = denoised_data;
+        source = data['d1'] if i%2 else data['d0'];
+        target = data['d0'] if i%2 else data['d1'];
 
         for y in range(height):
             for x in range(width):
@@ -35,27 +48,50 @@ def denoise_image_data(data, width, height, kappa=1, iterations=1):
                 one_left  = current - 1;
 
                 # Get the weighted average and set it for the current pixel
-                target[current] = source[current] + \
-                                  kappa*(
+                target[current] = int(source[current] + kappa*(
                                       source[one_up]
                                       + source[one_left]
                                       - 4 * source[current]
                                       + source[one_right]
                                       + source[one_down]
-                                  );
+                                  ));
 
     return target;
 
 # If-test to ensure code only executed if ran as stand-alone app.
 if __name__ == "__main__":
-    image = Image.open('disasterbefore.jpg');
+    parser = argparse.ArgumentParser();
+
+    parser.add_argument('source',  metavar='src', help='Path to source image');
+    parser.add_argument('destination',  metavar='dst', help='Destination for output image');
+    parser.add_argument('--kappa', metavar='K', type=restricted_float, default=0.2, help="Kappa value. Allowed range [0.0, 1.0]");
+    parser.add_argument('--iterations', metavar='I', type=int, default=5, help='Number of iterations to run with the denoiser.');
+
+    args = parser.parse_args();
+
+    # Open image
+    try:
+        image = Image.open(args.source);
+    except IOError:
+        print 'Source file [%s] could not be loaded.' % args.source;
+        exit();
+
+    # Get pixel information from image
     data  = list(image.getdata());
 
     # Get image dimensions
     width, height = image.size;
 
-    denoised_data = denoise_image_data(data, width, height, 0.2, 1);
+    # Perform denoising of image
+    denoised_data = denoise_image_data(data, width, height, args.kappa, args.iterations);
 
-    im = Image.new("L", (width, height))
-    im.putdata(denoised_data)
-    im.save("disaster_after.jpg")
+    # Ouput denoised image data to new file
+    im = Image.new("L", (width, height));
+    im.putdata(denoised_data);
+
+    # Save file
+    try:
+        im.save(args.destination);
+    except IOError:
+        print 'Destination file [%s] was not writeable.' % args.destination;
+        exit();
