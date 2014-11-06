@@ -19,6 +19,12 @@ def denoise_image_data(data0, width, height, kappa=1, iterations=1):
         'd1' : [None] * (width * height) # Same-sized array
     };
 
+    # Creating lists once to avoid doing it on each iteration
+    i_range = range(iterations);
+    y_range = range(height);
+    x_range = range(width);
+
+
     # Set both source and target to d0 now, to accound for
     # the unlikely edge case where we're doing no iterations.
     # Setting the target to d1 right away would then cause
@@ -27,12 +33,17 @@ def denoise_image_data(data0, width, height, kappa=1, iterations=1):
     source = data['d0'];
     target = data['d0'];
 
-    for i in range(iterations):
+    # Do iterations
+    for i in i_range:
         source = data['d1'] if i%2 else data['d0'];
         target = data['d0'] if i%2 else data['d1'];
 
-        for y in range(height):
-            for x in range(width):
+        # Iterate over each row in the picture
+        for y in y_range:
+
+            # Iterate over each pixel in the row
+            for x in x_range:
+
                 # Calculate index of current cell
                 current = (y * width) + x;
 
