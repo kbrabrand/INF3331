@@ -1,21 +1,12 @@
-import argparse;    # Argument parser
-import numpy as np; # NumPy
-import copy;        #
+import argparse;         # Argument parser
+import numpy as np;      # NumPy
+import copy;             # Tool for copying objects/arrays
+from PIL import Image;   # Python image library
+from scipy import weave; # Weave. For C, you know..
 
-from PIL import Image;
-from scipy import weave;
-
-from denoise_shared import restricted_float, valid_file;
-
+from src.denoise import shared; # Shared logic for denoise
 
 def denoise_image_data(data0, width, height, kappa=1.0, iterations=1):
-    #assert(type(data) == type([]));
-
-    #m = height
-    #n = width
-
-    #print data0;
-
     code = """
     int i, j, iteration;
 
@@ -100,7 +91,7 @@ if __name__ == "__main__":
 
     parser.add_argument('source',  metavar='src', help='Path to source image');
     parser.add_argument('destination',  metavar='dst', help='Destination for output image');
-    parser.add_argument('--kappa', metavar='K', type=restricted_float, default=0.2, help="Kappa value. Allowed range [0.0, 1.0]");
+    parser.add_argument('--kappa', metavar='K', type=shared.restricted_float, default=0.2, help="Kappa value. Allowed range [0.0, 1.0]");
     parser.add_argument('--iterations', metavar='I', type=int, default=5, help='Number of iterations to run with the denoiser.');
 
     args = parser.parse_args();

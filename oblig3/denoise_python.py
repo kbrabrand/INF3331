@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-import argparse;
-from PIL import Image;
+import argparse;         # Argument parser
+from PIL import Image;   # Python image library
 
-from denoise_shared import restricted_float, valid_file;
+from src.denoise import shared; # Shared logic for denoise
 
 def restricted_float(x):
     x = float(x);
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
     parser.add_argument('source',  metavar='src', help='Path to source image');
     parser.add_argument('destination',  metavar='dst', help='Destination for output image');
-    parser.add_argument('--kappa', metavar='K', type=restricted_float, default=0.2, help="Kappa value. Allowed range [0.0, 1.0]");
+    parser.add_argument('--kappa', metavar='K', type=shared.restricted_float, default=0.2, help="Kappa value. Allowed range [0.0, 1.0]");
     parser.add_argument('--iterations', metavar='I', type=int, default=5, help='Number of iterations to run with the denoiser.');
 
     args = parser.parse_args();
