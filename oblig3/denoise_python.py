@@ -58,6 +58,34 @@ def denoise_image_data(data0, width, height, kappa=1, iterations=1):
 
     return target;
 
+def denoise_file(source, destination, kappa, iterations):
+    # Open image
+    try:
+        image = Image.open(source);
+    except IOError:
+        print 'Source file [%s] could not be loaded.' % source;
+        exit();
+
+    # Get pixel information from image
+    data  = list(image.getdata());
+
+    # Get image dimensions
+    width, height = image.size;
+
+    # Perform denoising of image
+    denoised_data = denoise_image_data(data, width, height, kappa, iterations);
+
+    # Ouput denoised image data to new file
+    im = Image.new("L", (width, height));
+    im.putdata(denoised_data);
+
+    # Save file
+    try:
+        im.save(destination);
+    except IOError:
+        print 'Destination file [%s] was not writeable.' % args.destination;
+        exit();
+
 # If-test to ensure code only executed if ran as stand-alone app.
 if __name__ == "__main__":
     parser = argparse.ArgumentParser();
@@ -69,29 +97,5 @@ if __name__ == "__main__":
 
     args = parser.parse_args();
 
-    # Open image
-    try:
-        image = Image.open(args.source);
-    except IOError:
-        print 'Source file [%s] could not be loaded.' % args.source;
-        exit();
-
-    # Get pixel information from image
-    data  = list(image.getdata());
-
-    # Get image dimensions
-    width, height = image.size;
-
-    # Perform denoising of image
-    denoised_data = denoise_image_data(data, width, height, args.kappa, args.iterations);
-
-    # Ouput denoised image data to new file
-    im = Image.new("L", (width, height));
-    im.putdata(denoised_data);
-
-    # Save file
-    try:
-        im.save(args.destination);
-    except IOError:
-        print 'Destination file [%s] was not writeable.' % args.destination;
-        exit();
+    # Perform denoising of file
+    denoise_file(args.source, args.destination, args.kappa, args.iterations);
