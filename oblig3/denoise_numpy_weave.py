@@ -85,6 +85,27 @@ def denoise_image_data(data0, width, height, kappa=1.0, iterations=1):
 
     return data1;
 
+def denoise_file(source, destination, kappa=1.0, iterations=1):
+    # Load image data from input file into an numpy.ndarray
+    try:
+        data = np.array(Image.open(source))
+    except IOError:
+        print 'Source file [%s] could not be loaded.' % source;
+        exit();
+
+    # Get width and height based on the data shape
+    height, width = data.shape[:2];
+
+    # Perform denoising of image
+    denoised_data = denoise_image_data(data, width, height, kappa, iterations);
+
+    # Ouput denoised image data to new file
+    try:
+        Image.fromarray(denoised_data).save(destination);
+    except IOError:
+        print 'Destination file [%s] was not writeable.' % destination;
+        exit();
+
 # If-test to ensure code only executed if ran as stand-alone app.
 if __name__ == "__main__":
     parser = argparse.ArgumentParser();
@@ -96,23 +117,5 @@ if __name__ == "__main__":
 
     args = parser.parse_args();
 
-    # Load image data from input file into an numpy.ndarray
-    try:
-        data = np.array(Image.open(args.source))
-    except IOError:
-        print 'Source file [%s] could not be loaded.' % args.source;
-        exit();
-
-    # Get width and height based on the data shape
-    height, width = data.shape[:2];
-
-    # Perform denoising of image
-    denoised_data = denoise_image_data(data, width, height, args.kappa, args.iterations);
-
-    # Ouput denoised image data to new file
-    try:
-        Image.fromarray(denoised_data).save(args.destination);
-    except IOError:
-        print 'Destination file [%s] was not writeable.' % args.destination;
-        exit();
-
+    # Perform denoising of file
+    denoise_file(args.source, args.destination, args.kappa, args.iterations);
