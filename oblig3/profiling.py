@@ -1,8 +1,8 @@
 import cProfile, pstats, StringIO;
 import re;
 
-from denoise_python 	 import denoise_file as python_denoise;
-from denoise_numpy_weave import denoise_file as numpy_weave_denoise;
+from src.denoise.pure_python import denoise_file as python_denoise;
+from src.denoise.numpy_weave import denoise_file as numpy_weave_denoise;
 
 denoisers = ['python_denoise', 'numpy_weave_denoise'];
 
@@ -34,5 +34,9 @@ for denoiser in denoisers:
 	s = StringIO.StringIO();
 	ps = pstats.Stats(pr, stream=s).sort_stats('cumulative');
 	ps.print_stats();
+
+	print "\n\n==================================================";
+	print '{:=^50}'.format(" " + denoiser + " ");
+	print "==================================================";
 
 	print "\n".join(s.getvalue().splitlines()[4:8]);

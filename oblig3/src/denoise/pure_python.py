@@ -1,17 +1,5 @@
-#!/usr/bin/env python
-
-import argparse;         # Argument parser
-from PIL import Image;   # Python image library
-
+from PIL import Image;          # Python image library
 from src.denoise import shared; # Shared logic for denoise
-
-def restricted_float(x):
-    x = float(x);
-
-    if x < 0.0 or x > 1.0:
-        raise argparse.ArgumentTypeError("%r not in range [0.0, 1.0]"%(x,));
-
-    return x;
 
 def denoise_image_data(data0, width, height, kappa=1, iterations=1):
     data = {

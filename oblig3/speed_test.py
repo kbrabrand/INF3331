@@ -1,7 +1,7 @@
 from timeit import timeit;
 
 # Set up paths
-scripts   = ['denoise_numpy_weave', 'denoise_python'];
+scripts   = ['pure_python', 'numpy_weave'];
 test_file = 'assets/disasterbefore.jpg';
 out_file  = 'tmp/out.jpg';
 
@@ -20,7 +20,7 @@ script_name_length = len(max(scripts, key=len));
 
 # Perform the test once for each script
 for script in scripts:
-	setup = "from %s import denoise_file" % script;
+	setup = "from src.denoise.%s import denoise_file" % script;
 	codeline = "denoise_file(\"%s\", \"%s\", %f, %d)" % (test_file, out_file, kappa, iterations);
 
 	# Prepare padded script name, for prettier output
