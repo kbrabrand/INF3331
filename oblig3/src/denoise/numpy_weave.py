@@ -3,7 +3,7 @@ import copy;             # Tool for copying objects/arrays
 from PIL import Image;   # Python image library
 from scipy import weave; # Weave. For C, you know..
 
-#from src.denoise import shared; # Shared logic for denoise
+from src.denoise import shared; # Shared logic for denoise
 
 support_c = """
     #include <math.h>
@@ -20,13 +20,17 @@ support_c = """
         int B; // Blue
     } RGB;
 
+    // Value for pi, used in the math below
+    float pi = 3.14159256;
+
+    // Create an HSI instance based on the RGB values
     HSI createHSIFromRGB(RGB rgb) {
         HSI hsi;
 
         float tmp1, tmp2;
         float r, g, b;
 
-        // Cast all values to floats for use when doing maths.
+        // Cast all values to floats for use when doing math.
         r = (float) rgb.R;
         g = (float) rgb.G;
         b = (float) rgb.B;
@@ -48,18 +52,64 @@ support_c = """
         tmp2 -= r*g + r*b + g*b;
 
         if (g >= b) {
-            hsi.H = acos(tmp1/sqrt(tmp2))*180/3.14159256;
+            hsi.H = acos(tmp1 / sqrt(tmp2)) * 180 / pi;
         } else {
-            hsi.H = 360.0 - acos(tmp1/sqrt(tmp2))*180/3.14159256;
+            hsi.H = 360.0 - acos(tmp1 / sqrt(tmp2)) * 180 / pi;
         }
 
         return hsi;
     }
 
-    RGB* createRGBFromHSI(HSI* hsi) {
+    // Create an RGB instance based on the HSI values
+    RGB createRGBFromHSI(HSI hsi) {
+        RGB rgb;
 
+        // H == 0
+        if (hsi.H == 0) {
+            rgb.R = roundf(hsi.I + 2 * hsi.I * hsi.S);
+            rgb.G = roundf(hsi.I - hsi.I * hsi.S);
+            rgb.B = roundf(hsi.I - hsi.I * hsi.S);
+        }
+
+        // 0 > H < 120
+        if (hsi.H > 0 && hsi.H < 120) {
+            rgb.R = roundf(hsi.I + (hsi.I * hsi.S * (cos(hsi.H * pi / 180) / cos((60 - hsi.H) * pi / 180))));
+            rgb.G = roundf(hsi.I + (hsi.I * hsi.S * (1 - (cos(hsi.H * pi / 180) / cos((60 - hsi.H) * pi / 180)))));
+            rgb.B = roundf(hsi.I - hsi.I * hsi.S);
+        }
+
+        // H == 120
+        if (hsi.H == 120) {
+            rgb.R = roundf(hsi.I - hsi.I * hsi.S);
+            rgb.G = roundf(hsi.I + 2 * hsi.I * hsi.S);
+            rgb.B = roundf(hsi.I - hsi.I * hsi.S);
+        }
+
+        // 120 > H < 240
+        if (hsi.H > 120 && hsi.H < 240) {
+            rgb.R = roundf(hsi.I - hsi.I * hsi.S);
+            rgb.G = roundf(hsi.I + (hsi.I * hsi.S * (cos((hsi.H - 120) * pi / 180) / cos((180 - hsi.H) * pi / 180))));
+            rgb.B = roundf(hsi.I + (hsi.I * hsi.S * (1 - (cos((hsi.H - 120) * pi / 180) / cos((180 - hsi.H) * pi / 180)))));
+        }
+
+        // H == 240
+        if (hsi.H == 240) {
+            rgb.R = roundf(hsi.I - hsi.I * hsi.S);
+            rgb.G = roundf(hsi.I - hsi.I * hsi.S);
+            rgb.B = roundf(hsi.I + 2 * hsi.I * hsi.S);
+        }
+
+        // 240 > H < 360
+        if (hsi.H > 240 && hsi.H < 360) {
+            rgb.R = roundf(hsi.I + (hsi.I * hsi.S * (1 - (cos((hsi.H - 240) * pi / 180) / cos((300 - hsi.H) * pi / 180)))));
+            rgb.G = roundf(hsi.I - hsi.I * hsi.S);
+            rgb.B = roundf(hsi.I + (hsi.I * hsi.S * (cos((hsi.H - 240) * pi / 180) / cos((300 - hsi.H) * pi / 180))));
+        }
+
+        return rgb;
     }
 
+    // Create RGB instance from three int values (r, g and b)
     RGB createRGB(int r, int g, int b) {
         RGB rgb;
 
@@ -127,6 +177,8 @@ denoise_c = """
         }
     }
 
+    true;
+
     data1 = target;
 """;
 
@@ -181,26 +233,3 @@ def denoise_file(source, destination, kappa=1.0, iterations=1):
     except IOError:
         print 'Destination file [%s] was not writeable.' % destination;
         exit();
-
-if __name__ == "__main__":
-    code1 = """
-    int r, g, b;
-
-    r = 120;
-    g = 60;
-    b = 90;
-
-    RGB rgb = createRGB(r, g, b);
-
-    HSI hsi  = createHSIFromRGB(rgb);
-
-    return_val = hsi.I;
-    """;
-
-    print 'HSI = (19, 0.129, 0.405);';
-    print weave.inline(
-        code1,
-        [],
-        support_code = support_c,
-        headers = ['<math.h>']
-    );
