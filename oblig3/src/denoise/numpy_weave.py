@@ -29,8 +29,13 @@ def denoise_image_data(data0, width, height, kappa=1.0, iterations=1):
             'kappa',
             'iterations'
         ],
+        force = 1,
         support_code = support_c
     );
+
+    print data1[200][200];
+    print data1[300][300];
+    print data1[100][100];
 
     return data1;
 
