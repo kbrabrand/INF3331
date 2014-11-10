@@ -114,16 +114,16 @@ support_c = """
         HSI denoised;
 
         // Hue
-        denoised.H = fmax(0, fmin(360, (float) current.H + kappa * (
+        denoised.H = fmax(0, fmin(359, roundf((float) current.H + kappa * (
             one_up.H
             + one_left.H
             - 4 * current.H
             + one_right.H
             + one_down.H
-        )));
+        ))));
 
         // Saturation
-        denoised.S = fmax(0, fmin(1, (float) current.S + kappa * (
+        denoised.S = fmax(0, fmin(1, current.S + kappa * (
             one_up.S
             + one_left.S
             - 4 * current.S
@@ -132,7 +132,7 @@ support_c = """
         )));
 
         // Intensity
-        denoised.I = fmax(0, fmin(255, current.I + kappa * (
+        denoised.I = fmax(0, fmin(1, current.I + kappa * (
             one_up.I
             + one_left.I
             - 4 * current.I
