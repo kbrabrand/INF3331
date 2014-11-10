@@ -71,6 +71,11 @@ def denoise_file(source, destination, kappa, iterations):
     # Get image dimensions
     width, height = image.size;
 
+    # Check if the image is a color image
+    if type(data[0]) is tuple:
+        print 'Color image support is not part of the pure python implementation.';
+        exit();
+
     # Perform denoising of image
     denoised_data = denoise_image_data(data, width, height, kappa, iterations);
 
