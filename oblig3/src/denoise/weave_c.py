@@ -182,21 +182,27 @@ denoise_c = """
                 // Copy the edge pixels as is
                 if (i == 0 || j == 0 || i+1 == height || j+1 == width) {
                     target[current] = source[current];
+
+                    if (channels == 3) { // RGB
+                        target[current + 1] = source[current + 1];
+                        target[current + 2] = source[current + 2];
+                    }
+
                     continue;
                 }
 
                 // Calculate the index of the cells one position up/down/left/right
-                one_up    = current - width*channels;
-                one_right = current + 1*channels;
-                one_down  = current + width*channels;
-                one_left  = current - 1*channels;
+                one_up    = current - (width * channels);
+                one_right = current + channels;
+                one_down  = current + (width * channels);
+                one_left  = current - channels;
 
                 if (channels == 3) { // RGB
-                    current_HSI    = createHSIFromRGB(current, current+1, current+2);
-                    one_up_HSI     = createHSIFromRGB(one_up, one_up+1, one_up+2);
-                    one_right_HSI  = createHSIFromRGB(one_right, one_right+1, one_right+2);
-                    one_down_HSI   = createHSIFromRGB(one_down, one_down+1, one_down+2);
-                    one_left_HSI   = createHSIFromRGB(one_left, one_left+1, one_left+2);
+                    current_HSI    = createHSIFromRGB(source[current], source[current+1], source[current+2]);
+                    one_up_HSI     = createHSIFromRGB(source[one_up], source[one_up+1], source[one_up+2]);
+                    one_right_HSI  = createHSIFromRGB(source[one_right], source[one_right+1], source[one_right+2]);
+                    one_down_HSI   = createHSIFromRGB(source[one_down], source[one_down+1], source[one_down+2]);
+                    one_left_HSI   = createHSIFromRGB(source[one_left], source[one_left+1], source[one_left+2]);
 
                     denoised_HSI   = calculated_denoised_HSI(
                         current_HSI,
@@ -207,7 +213,7 @@ denoise_c = """
                         kappa
                     );
 
-                    denoised_RGB = createRGBFromHSI(current_HSI);
+                    denoised_RGB = createRGBFromHSI(denoised_HSI);
 
                     target[current]   = denoised_RGB.R;
                     target[current+1] = denoised_RGB.G;
@@ -230,8 +236,6 @@ denoise_c = """
             }
         }
     }
-
-    true;
 
     data1 = target;
 """;
