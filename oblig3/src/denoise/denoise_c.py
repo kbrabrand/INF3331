@@ -45,7 +45,8 @@ def denoise_file(source, destination, kappa, iterations, manipulations={}):
     'Manipulations are not supported i C backend'
 
     Empty string is returned upon successful denoising
-    >>> denoise_file('../../assets/disasterbefore.jpg', '../../tmp/out.jpg')
+    >>> denoise_file('../../assets/disasterbefore.jpg', '../../tmp/out.jpg', 0.1, 10)
+    ''
     """
 
     try:
