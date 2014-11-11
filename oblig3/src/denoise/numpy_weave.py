@@ -181,7 +181,7 @@ def denoise_file(source, destination, kappa=1.0, iterations=1, manipulations={},
     'Source file [non-existant.jpg] could not be loaded.'
 
     Empty string is returned upon successful denoising
-    >>> denoise_file('../../assets/disasterbefore.jpg', '../../tmp/out.jpg')
+    >>> denoise_file('../../assets/disasterbefore.jpg', '../../tmp/out.jpg', 0.1, 1)
     """
 
     # Load image data from input file into an numpy.ndarray
