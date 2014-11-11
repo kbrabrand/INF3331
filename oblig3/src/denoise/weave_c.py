@@ -148,32 +148,26 @@ denoise_c = """
     int i, j, iteration;
 
     // Temporary value variable
-    float tmp;
+    float tmp_val;
 
     // Variables to store index positions in
     int current, one_up, one_right, one_down, one_left;
 
     // Pointers to use when performing the denoising
-    npy_ubyte *source, *target;
-
-    // Set the source and target pointers
-    source = data0;
-    target = data0;
+    npy_ubyte* tmp;
 
     // HSI and RGB variables
     HSI current_HSI, one_up_HSI, one_right_HSI, one_down_HSI, one_left_HSI;
     HSI denoised_HSI;
-    RGB denoised_RGB;
+    HSI hsi;
+    RGB rgb;
+    int r, g, b;
 
+    // Do dem iterations
     for (iteration=0; iteration<iterations; iteration++) {
-        // On the first, third,... iteration, use data0 as source and
-        // data 1 as target. On the second, fourth and so on, do it the
-        // other way around.
-
-        source = iteration%2 ? data1 : data0;
-        target = iteration%2 ? data0 : data1;
 
         for (i=0; i<height; i++) {
+
             for (j=0; j<width; j++) {
 
                 // Calculate index of current pixel
@@ -181,13 +175,19 @@ denoise_c = """
 
                 // Copy the edge pixels as is
                 if (i == 0 || j == 0 || i+1 == height || j+1 == width) {
-                    target[current] = source[current];
 
+                    // Copy the edge pixel as is
+                    data1[current] = data0[current];
+
+                    // If we're working on a color image, we need to copy the
+                    // G and B component as well
                     if (channels == 3) { // RGB
-                        target[current + 1] = source[current + 1];
-                        target[current + 2] = source[current + 2];
+                        data1[current + 1] = data0[current + 1];
+                        data1[current + 2] = data0[current + 2];
                     }
 
+                    // Skip to next round to avoid doing the processing we're not
+                    // supposed to do for the edge pixels
                     continue;
                 }
 
@@ -197,13 +197,16 @@ denoise_c = """
                 one_down  = current + (width * channels);
                 one_left  = current - channels;
 
+                // Some extra magic for the color images
                 if (channels == 3) { // RGB
-                    current_HSI    = createHSIFromRGB(source[current], source[current+1], source[current+2]);
-                    one_up_HSI     = createHSIFromRGB(source[one_up], source[one_up+1], source[one_up+2]);
-                    one_right_HSI  = createHSIFromRGB(source[one_right], source[one_right+1], source[one_right+2]);
-                    one_down_HSI   = createHSIFromRGB(source[one_down], source[one_down+1], source[one_down+2]);
-                    one_left_HSI   = createHSIFromRGB(source[one_left], source[one_left+1], source[one_left+2]);
 
+                    current_HSI    = createHSIFromRGB(data0[current], data0[current+1], data0[current+2]);
+                    one_up_HSI     = createHSIFromRGB(data0[one_up], data0[one_up+1], data0[one_up+2]);
+                    one_right_HSI  = createHSIFromRGB(data0[one_right], data0[one_right+1], data0[one_right+2]);
+                    one_down_HSI   = createHSIFromRGB(data0[one_down], data0[one_down+1], data0[one_down+2]);
+                    one_left_HSI   = createHSIFromRGB(data0[one_left], data0[one_left+1], data0[one_left+2]);
+
+                    // Calculate denoised HSI values
                     denoised_HSI   = calculated_denoised_HSI(
                         current_HSI,
                         one_up_HSI,
@@ -213,29 +216,85 @@ denoise_c = """
                         kappa
                     );
 
-                    denoised_RGB = createRGBFromHSI(denoised_HSI);
+                    // Convert HSI back to RGB
+                    rgb = createRGBFromHSI(denoised_HSI);
 
-                    target[current]   = denoised_RGB.R;
-                    target[current+1] = denoised_RGB.G;
-                    target[current+2] = denoised_RGB.B;
+                    // Set the values back on the different components of the pixel
+                    data1[current]   = rgb.R;
+                    data1[current+1] = rgb.G;
+                    data1[current+2] = rgb.B;
 
                 } else { // MONOCHROME
 
                     // Calculate the weighted average and set it for the current pixel
-                    tmp = source[current] +
+                    tmp_val = data0[current] +
                           kappa * (
-                              source[one_up]
-                              + source[one_left]
-                              - 4 * source[current]
-                              + source[one_right]
-                              + source[one_down]
+                              data0[one_up]
+                              + data0[one_left]
+                              - 4 * data0[current]
+                              + data0[one_right]
+                              + data0[one_down]
                           );
 
-                    target[current] = (int) tmp;
+                    data1[current] = (int) tmp_val;
                 }
             }
         }
+
+        // Swap pointers before next iteration
+        tmp = data0;
+        data0 = data1;
+        data1 = tmp;
     }
 
-    data1 = target;
+    // Swap pointers back if we did an odd number of iterations
+    if (iterations && iteration%2) {
+        tmp = data0;
+        data0 = data1;
+        data1 = tmp;
+    }
+
+    // If this is a color image, we might be doing some channel manipulation
+    if (channels == 3) {
+
+        for (i=0; i<height; i++) {
+
+            for (j=0; j<width; j++) {
+
+                // Calulcate position of current pixel
+                current = ((i*width) + j) * channels;
+
+                // Get the r, g and b component
+                r = data1[current];
+                g = data1[current + 1];
+                b = data1[current + 2];
+
+                // Do conversion to/from HSI if the user specified a manipulation
+                // on one of the channels (H, S or I)
+                if (man_h != 0 || man_s != 0 || man_i != 0) {
+
+                    // Convert to HSI
+                    hsi = createHSIFromRGB(r, g, b);
+
+                    // Add the desired manipulation value and ensure within bounds
+                    hsi.H = fmax(0, fmin(359, hsi.H + man_h));
+                    hsi.I = fmax(0, fmin(1, hsi.I + man_i));
+                    hsi.S = fmax(0, fmin(1, hsi.S + man_s));
+
+                    // Convert back to RGB
+                    rgb = createRGBFromHSI(hsi);
+
+                    // Set manipulated values
+                    r = rgb.R;
+                    g = rgb.G;
+                    b = rgb.B;
+                }
+
+                // Set manipulated pixel values
+                data1[current]     = fmax(0, fmin(255, r + man_r));
+                data1[current + 1] = fmax(0, fmin(255, g + man_g));
+                data1[current + 2] = fmax(0, fmin(255, b + man_b));
+            }
+        }
+    }
 """;
