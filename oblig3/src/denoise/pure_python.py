@@ -1,6 +1,8 @@
 from PIL import Image;          # Python image library
 from src.denoise import shared; # Shared logic for denoise
 
+from src.denoise.shared import should_do_manipulation;
+
 def denoise_image_data(data0, width, height, kappa=1, iterations=1):
     data = {
         'd0' : data0,                    # Input data array
@@ -57,7 +59,7 @@ def denoise_image_data(data0, width, height, kappa=1, iterations=1):
 
     return target;
 
-def denoise_file(source, destination, kappa, iterations, maipulation={}):
+def denoise_file(source, destination, kappa, iterations, manipulations={}):
     # Open image
     try:
         image = Image.open(source);
@@ -73,7 +75,12 @@ def denoise_file(source, destination, kappa, iterations, maipulation={}):
 
     # Check if the image is a color image
     if type(data[0]) is tuple:
-        print 'Color image support is not part of the pure python implementation.';
+        print 'Color images are not supported in the pure python backend.';
+        exit();
+
+    # Give warning if manipulation is requested
+    if should_do_manipulation(manipulations):
+        print 'Manipulations are not supported i C backend';
         exit();
 
     # Perform denoising of image
