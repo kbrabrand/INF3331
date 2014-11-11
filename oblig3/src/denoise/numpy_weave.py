@@ -6,7 +6,7 @@ from scipy import weave; # Weave. For C, you know..
 import shared;                            # Shared logic for denoise
 from weave_c import support_c, denoise_c; # Import denoising algorithm and support stuff
 
-def denoise_image_data(data0, width, height, kappa=1.0, iterations=1):
+def denoise_image_data(data0, width, height, kappa=1.0, iterations=1, manipulations={}):
     # Get number of channels per pixel
     channels = 1;
 
@@ -18,6 +18,13 @@ def denoise_image_data(data0, width, height, kappa=1.0, iterations=1):
     # Make copy of the image data
     data1 = copy.deepcopy(data0);
 
+    man_r = manipulations['lr'];
+    man_g = manipulations['lg'];
+    man_b = manipulations['lb'];
+    man_h = manipulations['lh'];
+    man_s = manipulations['ls'];
+    man_i = manipulations['li'];
+
     weave.inline(
         denoise_c,
         [
@@ -27,14 +34,21 @@ def denoise_image_data(data0, width, height, kappa=1.0, iterations=1):
             'height',
             'channels',
             'kappa',
-            'iterations'
+            'iterations',
+            'man_r',
+            'man_g',
+            'man_b',
+            'man_h',
+            'man_s',
+            'man_i'
         ],
+        force = 1,
         support_code = support_c
     );
 
     return data1;
 
-def denoise_file(source, destination, kappa=1.0, iterations=1):
+def denoise_file(source, destination, kappa=1.0, iterations=1, manipulations={}):
     # Load image data from input file into an numpy.ndarray
     try:
         data = np.array(Image.open(source))
@@ -46,7 +60,7 @@ def denoise_file(source, destination, kappa=1.0, iterations=1):
     height, width = data.shape[:2];
 
     # Perform denoising of image
-    denoised_data = denoise_image_data(data, width, height, kappa, iterations);
+    denoised_data = denoise_image_data(data, width, height, kappa, iterations, manipulations);
 
     # Ouput denoised image data to new file
     try:
