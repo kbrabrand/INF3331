@@ -5,7 +5,7 @@ from os import path; # Path helpers
 
 from shared import should_do_manipulation;
 
-def denoise_file(source, destination, kappa, iterations, manipulations={}):
+def denoise_file(source, destination, kappa, iterations, manipulations={}, verbose=False):
     """
     Ferforms denoising of the source file and outputs the response to the
     destination file.
@@ -54,6 +54,9 @@ def denoise_file(source, destination, kappa, iterations, manipulations={}):
     except IOError:
         return 'Source file [%s] could not be loaded.' % source;
 
+    if verbose:
+        print 'Image data read from %s' % source;
+
     # Get width and height based on the data shape
     if len(data.shape) > 2:
         return 'Color images are not supported in C backend.';
@@ -75,6 +78,11 @@ def denoise_file(source, destination, kappa, iterations, manipulations={}):
         source,
         destination
     ];
+
+    if verbose:
+        print 'Forking new process from command:\n%s' % script_path;
+        print 'Arguments:';
+        print arguments[1:];
 
     try:
         # Open a sub process with the arguments
