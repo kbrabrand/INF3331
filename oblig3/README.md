@@ -10,8 +10,7 @@ There's not much to install really, but in order to use the pure C backend (no s
 If you've got gcc and make installed it should be as easy as the following;
 
 ```bash
-$ cd lib
-$ make
+$ cd lib && make
 ```
 
 Unless you se lots of warnings or other scary stuff when running the command you should be good to go. The interaction with the C backend is done throught the denoise.py script.
