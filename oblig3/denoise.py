@@ -1,6 +1,7 @@
 import argparse;
 from src.denoise.pure_python import denoise_file as python_denoise;
 from src.denoise.numpy_weave import denoise_file as numpy_weave_denoise;
+from src.denoise.denoise_c   import denoise_file as c_denoise;
 from src.denoise.shared      import restricted_float;
 
 # If-test to ensure code only executed if ran as stand-alone app.
@@ -9,7 +10,7 @@ if __name__ == "__main__":
 
     parser.add_argument('source',  	    metavar='src', help='Path to source image');
     parser.add_argument('destination',  metavar='dst', help='Destination for output image');
-    parser.add_argument('--denoiser',   metavar='denoiser', default="numpy_weave", choices=['python', 'numpy_weave'], help='What denoiser to use');
+    parser.add_argument('--denoiser',   metavar='denoiser', default="numpy_weave", choices=['python', 'numpy_weave', 'c'], help='What denoiser to use');
     parser.add_argument('--denoise',    metavar='D', type=int, default=1, help='Perform denoising of image', choices=[0, 1]);
     parser.add_argument('--kappa',      metavar='K', type=restricted_float, default=0.1, help="Kappa value. Allowed range [0.0, 1.0]");
     parser.add_argument('--iterations', metavar='I', type=int, default=10, help='Number of iterations to run with the denoiser.');
