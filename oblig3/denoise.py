@@ -14,7 +14,7 @@ if __name__ == "__main__":
     parser.add_argument('--backend',       metavar='B', default="numpy_weave", choices=['python', 'numpy_weave', 'c'], help='What backend to use');
     parser.add_argument('--denoise',       metavar='D', type=int, default=1, help='Perform denoising of image', choices=[0, 1]);
     parser.add_argument('--kappa',         metavar='K', type=restricted_float, default=0.1, help="Kappa value. Allowed range [0.0, 1.0]");
-    parser.add_argument('--iterations',    metavar='I', type=int, default=10, help='Number of iterations to run with the denoiser.');
+    parser.add_argument('--iter',          metavar='I', type=int, default=10, help='Number of iterations to run with the denoiser.');
     parser.add_argument('--eps', 		   metavar='E', type=int, default=2, help="Fault tolerance");
     parser.add_argument('--verbose', '-v', dest='verbose', help="Enable verbose script output", action='store_true');
 
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     args = parser.parse_args();
 
     # Set iterations to 0 if denoising is disabled
-    iterations = args.iterations if args.denoise else 0;
+    iterations = args.iter if args.denoise else 0;
 
     # Get denoiser function from local symbol table
     backend = locals()[args.backend + "_denoise"];
