@@ -32,6 +32,26 @@ def denoise_image_data(data0, width, height, kappa=1.0, iterations=1, manipulati
     numpy_array
         NumpPy array with the same shape as the data0 parameter containing
         manipulated image data.
+
+    Examples
+    --------
+    Ensure that correct average weighted average is calculated with kappa=1.0
+    >>> denoise_image_data(np.array([[30, 30, 30, 30], [40, 10, 20, 40], [50, 50, 50, 50]], dtype=np.uint8), 4, 3, 1, 1)
+    array([[ 30,  30,  30,  30],
+           [ 40, 110,  70,  40],
+           [ 50,  50,  50,  50]], dtype=uint8)
+
+    Ensure that correct average weighted average is calculated with kappa=0.5
+    >>> denoise_image_data(np.array([[30, 30, 30, 30], [40, 10, 20, 40], [50, 50, 50, 50]], dtype=np.uint8), 4, 3, 0.5, 1)
+    array([[30, 30, 30, 30],
+           [40, 60, 45, 40],
+           [50, 50, 50, 50]], dtype=uint8)
+
+    Ensure that input is returned when doing no iterations
+    >>> denoise_image_data(np.array([[30, 30, 30, 30], [40, 10, 20, 40], [50, 50, 50, 50]], dtype=np.uint8), 4, 3, 1, 0)
+    array([[30, 30, 30, 30],
+           [40, 10, 20, 40],
+           [50, 50, 50, 50]], dtype=uint8)
     """
 
     # Get number of channels per pixel
