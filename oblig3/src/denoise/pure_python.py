@@ -1,9 +1,45 @@
 from PIL import Image;          # Python image library
-from src.denoise import shared; # Shared logic for denoise
 
-from src.denoise.shared import should_do_manipulation;
+from shared import should_do_manipulation;
 
 def denoise_image_data(data0, width, height, kappa=1, iterations=1):
+    """
+    Performs denoising of image data.
+
+    Parameters
+    ----------
+    data0 : array
+        Array containing the pixel values.
+    width : int
+        Image width in pixels.
+    height : int
+        Image height in pixels.
+    kappa : float
+        The denoising factor. Allowed range: [0.0-1.0]
+    iterations : int
+        Number of interations to do with the denoising.
+
+    Returns
+    -------
+    array
+        Array with the same shape as the data0 parameter containing
+        manipulated image data.
+
+    Examples
+    --------
+    Ensure that correct average weighted average is calculated with kappa=1.0
+    >>> denoise_image_data([30, 30, 30, 30, 40, 10, 20, 40, 50, 50, 50, 50], 4, 3, 1, 1)
+    [30, 30, 30, 30, 40, 110, 70, 40, 50, 50, 50, 50]
+
+    Ensure that correct average weighted average is calculated with kappa=0.5
+    >>> denoise_image_data([30, 30, 30, 30, 40, 10, 20, 40, 50, 50, 50, 50], 4, 3, 0.5, 1)
+    [30, 30, 30, 30, 40, 60, 45, 40, 50, 50, 50, 50]
+
+    Ensure that input is returned when doing no iterations
+    >>> denoise_image_data([30, 30, 30, 30, 40, 10, 20, 40, 50, 50, 50, 50], 4, 3, 1, 0)
+    [30, 30, 30, 30, 40, 10, 20, 40, 50, 50, 50, 50]
+    """
+
     data = {
         'd0' : data0,                    # Input data array
         'd1' : [None] * (width * height) # Same-sized array
@@ -96,3 +132,7 @@ def denoise_file(source, destination, kappa, iterations, manipulations={}):
     except IOError:
         print 'Destination file [%s] was not writeable.' % args.destination;
         exit();
+
+if __name__ == "__main__":
+    import doctest;
+    doctest.testmod();
