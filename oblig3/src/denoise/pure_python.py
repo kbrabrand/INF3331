@@ -57,7 +57,7 @@ def denoise_image_data(data0, width, height, kappa=1, iterations=1):
 
     return target;
 
-def denoise_file(source, destination, kappa, iterations):
+def denoise_file(source, destination, kappa, iterations, maipulation={}):
     # Open image
     try:
         image = Image.open(source);
