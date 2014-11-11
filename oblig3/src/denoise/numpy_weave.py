@@ -3,7 +3,6 @@ import copy;             # Tool for copying objects/arrays
 from PIL import Image;   # Python image library
 from scipy import weave; # Weave. For C, you know..
 
-import shared;                            # Shared logic for denoise
 from weave_c import support_c, denoise_c; # Import denoising algorithm and support stuff
 
 def denoise_image_data(data0, width, height, kappa=1.0, iterations=1, manipulations={}):
@@ -18,12 +17,12 @@ def denoise_image_data(data0, width, height, kappa=1.0, iterations=1, manipulati
     # Make copy of the image data
     data1 = copy.deepcopy(data0);
 
-    man_r = manipulations['lr'];
-    man_g = manipulations['lg'];
-    man_b = manipulations['lb'];
-    man_h = manipulations['lh'];
-    man_s = manipulations['ls'];
-    man_i = manipulations['li'];
+    man_r = manipulations['lr'] if 'lr' in manipulations.keys() else 0;
+    man_g = manipulations['lg'] if 'lg' in manipulations.keys() else 0;
+    man_b = manipulations['lb'] if 'lb' in manipulations.keys() else 0;
+    man_h = manipulations['lh'] if 'lh' in manipulations.keys() else 0;
+    man_s = manipulations['ls'] if 'ls' in manipulations.keys() else 0;
+    man_i = manipulations['li'] if 'li' in manipulations.keys() else 0;
 
     weave.inline(
         denoise_c,
@@ -42,7 +41,6 @@ def denoise_image_data(data0, width, height, kappa=1.0, iterations=1, manipulati
             'man_s',
             'man_i'
         ],
-        force = 1,
         support_code = support_c
     );
 
