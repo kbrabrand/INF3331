@@ -3,8 +3,9 @@ import re;
 
 from src.denoise.pure_python import denoise_file as python_denoise;
 from src.denoise.numpy_weave import denoise_file as numpy_weave_denoise;
+from src.denoise.denoise_c   import denoise_file as c_denoise;
 
-denoisers = ['python_denoise', 'numpy_weave_denoise'];
+denoisers = ['python_denoise', 'numpy_weave_denoise', 'c_denoise'];
 
 # Set up paths
 test_file = 'assets/disasterbefore.jpg';

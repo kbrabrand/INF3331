@@ -1,7 +1,7 @@
 from timeit import timeit;
 
 # Set up paths
-scripts   = ['pure_python', 'numpy_weave'];
+scripts   = ['pure_python', 'numpy_weave', 'denoise_c'];
 test_file = 'assets/disasterbefore.jpg';
 out_file  = 'tmp/out.jpg';
 
