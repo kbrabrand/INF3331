@@ -32,7 +32,7 @@ if __name__ == "__main__":
     denoiser = locals()[args.denoiser + "_denoise"];
 
     # Perform denoising
-    denoiser(
+    result = denoiser(
         args.source,
         args.destination,
         args.kappa,
@@ -42,3 +42,6 @@ if __name__ == "__main__":
             'lh': args.lh, 'ls': args.ls, 'li': args.li
         }
     );
+
+    if result:
+        print result;
