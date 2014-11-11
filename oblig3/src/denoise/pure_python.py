@@ -95,32 +95,76 @@ def denoise_image_data(data0, width, height, kappa=1, iterations=1):
 
     return target;
 
-def denoise_file(source, destination, kappa, iterations, manipulations={}):
+def denoise_file(source, destination, kappa, iterations, manipulations={}, verbose=False):
+    """
+    Ferforms denoising of the source file and outputs the response to the
+    destination file.
+
+    Parameters
+    ----------
+    source: str
+        Path to the file to denoise.
+    destination : str
+        Path to the destination (output) file.
+    kappa : float
+        The denoising factor. Allowed range: [0.0-1.0]
+    iterations : int
+        Number of interations to do with the denoising.
+    manipulations : dict
+        Manipulation dict is received to maintain an API thats similar
+        to the other backends, but it's not used for anything as the
+        functionality is missing in this backend.
+
+    Returns
+    -------
+    output : str
+        Empty string if OK. Error output if something didn't go right.
+
+    Example
+    -------
+    Error message returned if source does not exist
+    >>> denoise_file('non-existant.jpg', 'foo.jpg', 0.1, 10)
+    'Source file [non-existant.jpg] could not be loaded.'
+
+    Empty string is returned upon successful denoising
+    >>> denoise_file('../../assets/disasterbefore.jpg', '../../tmp/out.jpg', 0.1, 1)
+    """
+
     # Open image
     try:
         image = Image.open(source);
     except IOError:
-        print 'Source file [%s] could not be loaded.' % source;
-        exit();
+        return 'Source file [%s] could not be loaded.' % source;
 
     # Get pixel information from image
     data  = list(image.getdata());
 
+    if verbose:
+        print 'Image data read from %s' % source;
+
     # Get image dimensions
     width, height = image.size;
 
+    if verbose:
+        print 'Image shape:';
+        print image.size;
+
     # Check if the image is a color image
     if type(data[0]) is tuple:
-        print 'Color images are not supported in the pure python backend.';
-        exit();
+        return 'Color images are not supported in the pure python backend.';
 
     # Give warning if manipulation is requested
     if should_do_manipulation(manipulations):
-        print 'Manipulations are not supported i C backend';
-        exit();
+        return 'Manipulations are not supported i pure python backend';
+
+    if verbose:
+        print 'Start data processing';
 
     # Perform denoising of image
     denoised_data = denoise_image_data(data, width, height, kappa, iterations);
+
+    if verbose:
+        print 'Finished processing data';
 
     # Ouput denoised image data to new file
     im = Image.new("L", (width, height));
@@ -129,8 +173,12 @@ def denoise_file(source, destination, kappa, iterations, manipulations={}):
     # Save file
     try:
         im.save(destination);
+
+        if verbose:
+            print 'Wrote output data to %s' % destination;
+
     except IOError:
-        print 'Destination file [%s] was not writeable.' % args.destination;
+        return 'Destination file [%s] was not writeable.' % args.destination;
         exit();
 
 if __name__ == "__main__":
