@@ -25,7 +25,6 @@ def denoise_file(source, destination, kappa, iterations, manipulations={}):
         in RGB), lg (G component in RGB), lb (B component in RGB), lh (H component
         in HSI), ls (S component in HSI) and li (I component in HSI).
 
-
     Returns
     -------
     output : str
@@ -44,6 +43,9 @@ def denoise_file(source, destination, kappa, iterations, manipulations={}):
     Error message returned if manipulations are requested
     >>> denoise_file('../../assets/disasterbefore.jpg', 'foobar.jpg', 0.1, 10, {'lr': 100});
     'Manipulations are not supported i C backend'
+
+    Empty string is returned upon successful denoising
+    >>> denoise_file('../../assets/disasterbefore.jpg', '../../tmp/out.jpg')
     """
 
     try:
@@ -85,5 +87,5 @@ def denoise_file(source, destination, kappa, iterations, manipulations={}):
     return out;
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+    import doctest;
+    doctest.testmod();

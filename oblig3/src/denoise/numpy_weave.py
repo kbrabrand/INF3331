@@ -6,6 +6,34 @@ from scipy import weave; # Weave. For C, you know..
 from weave_c import support_c, denoise_c; # Import denoising algorithm and support stuff
 
 def denoise_image_data(data0, width, height, kappa=1.0, iterations=1, manipulations={}):
+    """
+    Performs denoising and/or manipulation of image data.
+
+    Parameters
+    ----------
+    data0 : numpy_array
+        Array containing the image information. 2-dim for monochrome
+        images and 3-dim for color images.
+    width : int
+        Image width in pixels.
+    height : int
+        Image height in pixels.
+    kappa : float
+        The denoising factor. Allowed range: [0.0-1.0]
+    iterations : int
+        Number of interations to do with the denoising.
+    manipulations : dict
+        Specification of the manipulations to do. Expected keys: lr (R component
+        in RGB), lg (G component in RGB), lb (B component in RGB), lh (H component
+        in HSI), ls (S component in HSI) and li (I component in HSI).
+
+    Returns
+    -------
+    numpy_array
+        NumpPy array with the same shape as the data0 parameter containing
+        manipulated image data.
+    """
+
     # Get number of channels per pixel
     channels = 1;
 
@@ -34,12 +62,12 @@ def denoise_image_data(data0, width, height, kappa=1.0, iterations=1, manipulati
             'channels',
             'kappa',
             'iterations',
-            'man_r',
-            'man_g',
-            'man_b',
-            'man_h',
-            'man_s',
-            'man_i'
+            'man_r', # Manipulation of R component
+            'man_g', # Manipulation of G component
+            'man_b', # Manipulation of B component
+            'man_h', # Manipulation of H component
+            'man_s', # Manipulation of S component
+            'man_i'  # Manipulation of I component
         ],
         support_code = support_c
     );
@@ -47,12 +75,45 @@ def denoise_image_data(data0, width, height, kappa=1.0, iterations=1, manipulati
     return data1;
 
 def denoise_file(source, destination, kappa=1.0, iterations=1, manipulations={}):
+    """
+    Ferforms denoising of the source file and outputs the response to the
+    destination file.
+
+    Parameters
+    ----------
+    source: str
+        Path to the file to denoise.
+    destination : str
+        Path to the destination (output) file.
+    kappa : float
+        The denoising factor. Allowed range: [0.0-1.0]
+    iterations : int
+        Number of interations to do with the denoising.
+    manipulations : dict
+        Specification of the manipulations to do. Expected keys: lr (R component
+        in RGB), lg (G component in RGB), lb (B component in RGB), lh (H component
+        in HSI), ls (S component in HSI) and li (I component in HSI).
+
+    Returns
+    -------
+    output : str
+        Empty string if OK. Error output if something didn't go right.
+
+    Example
+    -------
+    Error message returned if source does not exist
+    >>> denoise_file('non-existant.jpg', 'foo.jpg', 0.1, 10)
+    'Source file [non-existant.jpg] could not be loaded.'
+
+    Empty string is returned upon successful denoising
+    >>> denoise_file('../../assets/disasterbefore.jpg', '../../tmp/out.jpg')
+    """
+
     # Load image data from input file into an numpy.ndarray
     try:
         data = np.array(Image.open(source))
     except IOError:
-        print 'Source file [%s] could not be loaded.' % source;
-        exit();
+        return 'Source file [%s] could not be loaded.' % source;
 
     # Get width and height based on the data shape
     height, width = data.shape[:2];
@@ -64,5 +125,8 @@ def denoise_file(source, destination, kappa=1.0, iterations=1, manipulations={})
     try:
         Image.fromarray(denoised_data).save(destination);
     except IOError:
-        print 'Destination file [%s] was not writeable.' % destination;
-        exit();
+        return 'Destination file [%s] was not writeable.' % destination;
+
+if __name__ == "__main__":
+    import doctest;
+    doctest.testmod();
