@@ -149,7 +149,7 @@ def denoise_image_data(data0, width, height, kappa=1.0, iterations=1, manipulati
 
     return data1;
 
-def denoise_file(source, destination, kappa=1.0, iterations=1, manipulations={}):
+def denoise_file(source, destination, kappa=1.0, iterations=1, manipulations={}, verbose=False):
     """
     Ferforms denoising of the source file and outputs the response to the
     destination file.
@@ -190,15 +190,30 @@ def denoise_file(source, destination, kappa=1.0, iterations=1, manipulations={})
     except IOError:
         return 'Source file [%s] could not be loaded.' % source;
 
+    if verbose:
+        print 'Image data read from %s' % source;
+
     # Get width and height based on the data shape
     height, width = data.shape[:2];
+
+    if verbose:
+        print 'Image shape:';
+        print data.shape;
+        print 'Start data processing';
 
     # Perform denoising of image
     denoised_data = denoise_image_data(data, width, height, kappa, iterations, manipulations);
 
+    if verbose:
+        print 'Finished processing data';
+
     # Ouput denoised image data to new file
     try:
         Image.fromarray(denoised_data).save(destination);
+
+        if verbose:
+            print 'Wrote output data to %s' % destination;
+
     except IOError:
         return 'Destination file [%s] was not writeable.' % destination;
 
