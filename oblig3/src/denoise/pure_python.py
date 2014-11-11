@@ -49,13 +49,13 @@ def denoise_image_data(data0, width, height, kappa=1, iterations=1):
                 one_left  = current - 1;
 
                 # Get the weighted average and set it for the current pixel
-                target[current] = int(source[current] + kappa*(
+                target[current] = max(0, min(255, int(round(float(source[current]) + kappa*(
                                       source[one_up]
                                       + source[one_left]
                                       - 4 * source[current]
                                       + source[one_right]
                                       + source[one_down]
-                                  ));
+                                  )))));
 
     return target;
 
