@@ -10,10 +10,22 @@ def should_do_manipulation(manipulations):
 	if manipulations == {}:
 		return False;
 
-	if manipulations['lr'] != 0 or manipulations['lg'] != 0 or manipulations['lb'] != 0:
+	if 'lr' in manipulations.keys() and manipulations['lr'] != 0:
 		return True;
 
-	if manipulations['lh'] != 0 or manipulations['ls'] != 0 or manipulations['li'] != 0:
+	if 'lg' in manipulations.keys() and manipulations['lg'] != 0:
+		return True;
+
+	if 'lb' in manipulations.keys() and manipulations['lb'] != 0:
+		return True;
+
+	if 'lh' in manipulations.keys() and manipulations['lh'] != 0:
+		return True;
+
+	if 'ls' in manipulations.keys() and manipulations['ls'] != 0:
+		return True;
+
+	if 'li' in manipulations.keys() and manipulations['li'] != 0:
 		return True;
 
 	return False;
