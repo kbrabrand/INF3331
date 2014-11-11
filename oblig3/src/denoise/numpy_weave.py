@@ -5,6 +5,10 @@ from scipy import weave; # Weave. For C, you know..
 
 from weave_c import support_c, denoise_c; # Import denoising algorithm and support stuff
 
+color_image_data = np.array([[[100, 100, 100], [100, 100, 100], [100, 100, 100], [100, 100, 100]],
+                             [[120, 120, 120], [120, 120, 120], [80,   80,  80], [ 90,  90,  90]],
+                             [[120, 120, 120], [120, 120, 120], [120, 120, 120], [120, 120, 120]]], dtype=np.uint8)
+
 def denoise_image_data(data0, width, height, kappa=1.0, iterations=1, manipulations={}):
     """
     Performs denoising and/or manipulation of image data.
@@ -35,13 +39,13 @@ def denoise_image_data(data0, width, height, kappa=1.0, iterations=1, manipulati
 
     Examples
     --------
-    Ensure that correct average weighted average is calculated with kappa=1.0
+    Ensure that correct weighted average is calculated with kappa=1.0
     >>> denoise_image_data(np.array([[30, 30, 30, 30], [40, 10, 20, 40], [50, 50, 50, 50]], dtype=np.uint8), 4, 3, 1, 1)
     array([[ 30,  30,  30,  30],
            [ 40, 110,  70,  40],
            [ 50,  50,  50,  50]], dtype=uint8)
 
-    Ensure that correct average weighted average is calculated with kappa=0.5
+    Ensure that correct weighted average is calculated with kappa=0.5
     >>> denoise_image_data(np.array([[30, 30, 30, 30], [40, 10, 20, 40], [50, 50, 50, 50]], dtype=np.uint8), 4, 3, 0.5, 1)
     array([[30, 30, 30, 30],
            [40, 60, 45, 40],
@@ -52,6 +56,57 @@ def denoise_image_data(data0, width, height, kappa=1.0, iterations=1, manipulati
     array([[30, 30, 30, 30],
            [40, 10, 20, 40],
            [50, 50, 50, 50]], dtype=uint8)
+
+    Ensure correct weighted average is calculated for color image with kappa=0.1
+    >>> denoise_image_data(color_image_data, 4, 3, 0.1, 1)
+    array([[[100, 100, 100],
+            [100, 100, 100],
+            [100, 100, 100],
+            [100, 100, 100]],
+    <BLANKLINE>
+           [[120, 120, 120],
+            [114, 114, 114],
+            [ 91,  91,  91],
+            [ 90,  90,  90]],
+    <BLANKLINE>
+           [[120, 120, 120],
+            [120, 120, 120],
+            [120, 120, 120],
+            [120, 120, 120]]], dtype=uint8)
+
+    Ensure correct values if manipulating the R component
+    >>> denoise_image_data(color_image_data, 4, 3, 0.1, 1, {'lr': 10})
+    array([[[110, 100, 100],
+            [110, 100, 100],
+            [110, 100, 100],
+            [110, 100, 100]],
+    <BLANKLINE>
+           [[130, 120, 120],
+            [124, 114, 114],
+            [101,  91,  91],
+            [100,  90,  90]],
+    <BLANKLINE>
+           [[130, 120, 120],
+            [130, 120, 120],
+            [130, 120, 120],
+            [130, 120, 120]]], dtype=uint8)
+
+    Ensure correct values when manipulating both I and R components
+    >>> denoise_image_data(color_image_data, 4, 3, 0.1, 0, {'lr': 10, 'li': 0.1})
+    array([[[136, 126, 126],
+            [136, 126, 126],
+            [136, 126, 126],
+            [136, 126, 126]],
+    <BLANKLINE>
+           [[156, 146, 146],
+            [156, 146, 146],
+            [116, 106, 106],
+            [126, 116, 116]],
+    <BLANKLINE>
+           [[156, 146, 146],
+            [156, 146, 146],
+            [156, 146, 146],
+            [156, 146, 146]]], dtype=uint8)
     """
 
     # Get number of channels per pixel
