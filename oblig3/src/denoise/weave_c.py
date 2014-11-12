@@ -227,16 +227,14 @@ denoise_c = """
                 } else { // MONOCHROME
 
                     // Calculate the weighted average and set it for the current pixel
-                    tmp_val = data0[current] +
+                    data1[current] = (int) roundf((float) data0[current] +
                           kappa * (
                               data0[one_up]
                               + data0[one_left]
                               - 4 * data0[current]
                               + data0[one_right]
                               + data0[one_down]
-                          );
-
-                    data1[current] = (int) tmp_val;
+                          ));
                 }
             }
         }
