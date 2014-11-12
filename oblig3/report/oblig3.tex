@@ -4,24 +4,46 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 
-\title{Obligatorisk innlevering 2, høsten 2014, INF3331}
+\title{Obligatorisk innlevering 3, høsten 2014, INF3331}
 \author{Kristoffer Brabrand <kristrek@student.matnat.uio.no>}
 \date{\today}
 
 \begin{document}
 \maketitle
 
-\section*{Krav til kjøring}
-Pillow (PILs arvtager) må være installert for at python-scriptene i denne løsningen skal kjøres. For å installere Pillow kan for eksempel \verb;pip; eller \verb;easy_install; brukes.
+\section*{Innledende beskrivelse}
+Oppgaven var grei nok å løse når det kom til prinsipper og bruk av python, men matematikken bød på noen utfordringer. Disse var primært knyttet til omregning mellom de ulike fargerommene, avrunding, grenseverdier mv.
 
-\begin{Verbatim}[fontsize=\small, frame=single]
-$ easy_install Pillow
-\end{Verbatim}
+De beskrevne oppgavene er løst, men jeg oppdaget for sent at denoise.c opererer på floats og konverterer til en unsigned char (0-255). Ettersom jeg opererer på heltall og runder av underveis har jeg noe større avvik i oppgaven. Dette er beskrevet under den aktuelle oppgaven.
 
-eller
+Frontend for de ulike backendene er implementert i denoise.py i roten av oblig3-mappen, og er relativt enkel. Den gjør i korte trekk følgende;
 
-\begin{Verbatim}[fontsize=\small, frame=single]
-$ sudo pip install Pillow
-\end{Verbatim}
+\begin{enumerate}
+  \item Parsing av kommandolinjeparametre.
+  \item Validerer input.
+  \item Henter riktig backend ved bruk av den lokale symboltabellen.
+  \item Kaller \verb;denoise_file; på den valgte backenden;
+  \begin{enumerate}
+  	\item Laster fil inn i liste/numpy.ndarray.
+  	\item Utfører denoising og/eller manipulasjon av bildet.
+  	\item Skriver bearbeidet fil til målfil.
+  \end{enumerate}
+\end{enumerate}
+
+Parametrene denoise.py tar vises enklest ved å kalle den med -h som parameter. Outputen som gis når man kaller \verb;denoise.py -h; er vist nedenfor.
+
+%@exec python denoise.py -h
+
+\input{_oppg01.tex}
+
+\input{_oppg02.tex}
+
+\input{_oppg03.tex}
+
+\input{_oppg04.tex}
+
+\input{_oppg05.tex}
+
+\input{_oppg07.tex}
 
 \end{document}

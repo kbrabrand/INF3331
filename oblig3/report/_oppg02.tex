@@ -1,0 +1,25 @@
+\section*{Oppgave 1: Profilering}
+
+Profileringen av de tre implementasjonene er gjort i \verb;test_profiling.py;. Jeg implementerte oppgaven før jeg så kodeeksempelet som ble lagt ut og falt derfor ned på en litt mindre elegant løsning med splitting og offsetting for å finne riktig utvalg fra outputen.
+
+%@import
+s = StringIO.StringIO();
+ps = pstats.Stats(pr, stream=s).sort_stats('cumulative');
+ps.print_stats();
+
+print "\n\n==================================================";
+print '{:=^50}'.format(" " + denoiser + " ");
+print "==================================================";
+
+print "\n".join(s.getvalue().splitlines()[4:8]);
+%@
+
+\subsection*{Resultat fra kjøring}
+%@exec python test_profiling.py
+
+Resultatet viser nokså tydelig hastighetsforskjellen mellom den rene python-implementasjonen og numpy-weave/denoise\_c – som er tilnærmet like raske. \verb;cProfile; er et fint verktøy for å profilere og tune python-kode, men er ikke spesielt hjelpsomt hvis målet er å optimalisere C-kode. Da er trolig \verb;gprof; et mer passende verktøy.
+
+\subsection*{Kommentarer til implementasjonen}
+Det er imidlertid verdt å nevne at svart-hvit-delen av koden, som er basert på denoise.c har lite rom for optimalisering ettersom den er såpass enkel og bare opererer på array-indekser, mens fargedelen med fordel kunne vært optimalisert.
+
+Spesielt tenker jeg da på at den regner ut HSI-verdier fra RGB for omkringliggende punkter på nytt for hvert punkt. Den burde ha spart på, og gjenbrukt allokerte minneplasseringer for HSI og RGB-verdier og kunne nok med fordel også iterert over og konvertert alle piksler til HSI-verdier før manipuleringen begynte.

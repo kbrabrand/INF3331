@@ -1,0 +1,14 @@
+\section*{Oppgave 6: Testing og dokumentasjon}
+Siden oppgaven dreier seg om lite annet enn å implementere logikk i inline C gjennom weave/numpy er det vanskelig å skrive meningsfulle unit-tester til en testsuite og jeg har derfor valgt å holde meg til doctester og tester for hastighet og likhet.
+
+Likhetstesten går ut på å denoise filer med de ulike backendene og ulike nivå av kappa og iterasjonsantall. Det genereres bilder med kappa 0.1 og 0.2, og med 5 og 10 iterasjoner for alle backends.
+
+Deretter gås filene igjennom pixel for pixel og finner største og minste verdi for den gitte pixlen for en gitt kombinasjon av iter og kappa. Avviket mellom største og minste sjekkes så mot feiltoleransen som er satt (eps). For hver pixel som er innenfor grensen øker jeg telleren for vellykkede punkter og for hver som er utenfor øker jeg telleren for feilede punkter.
+
+Til slutt beregner jeg hvor stor andel av punktene som hadde større avvik enn forventet og skriver dette ut til brukeren. Nedenfor ser du output;
+
+\subsection*{EPS=2}
+%@exec python test_file_comparison.py 2
+
+\subsection*{EPS=3}
+%@exec python test_file_comparison.py 2

@@ -1,0 +1,11 @@
+\section*{Oppgave 5: Frontend}
+
+Output fra frontend er vist allerede, så jeg gjentar ikke det, men et par andre ting er verdt å nevne.
+
+\subsection*{Timeit i frontend}
+Det står nevnt i opgaveteksten at det skal være mulig å skru \verb;timeit;-modulen av/på i frontend. Med en tanke om fordeling av ansvar (separation of concerns) i bakhodet mener jeg at det tilfører lite verdi å ha timeit-funksjonalitet i frontenden ettersom man skjeldent bruker mer enn én backend samtidig likevel.
+
+Jeg valgte derfor, som tidligere beskrevet, å implementere hastighetssammenlikning i en separat fil; \verb;test_speed_test.py; og output fra denne er vist tidligere.
+
+\subsection*{eps-parameter til frontend}
+Jeg forsto rett og slett ikke hvorfor denne skulle være et parameter til frontend og valgte til slutt å ta den bort. Den er tatt med som første og eneste parameter til sammenlikningstesten som genererer og sammenlikner verdier i bilder (\verb;test_file_comparison.py;).

@@ -1,0 +1,14 @@
+\section*{Oppgave 3: Utvidelse til farger}
+
+Utvidelsen til farger er implementert i numpy-weave og hoveddelen av denne logikken finnes i \verb;support_c;-variablen i filen \verb;weave_c.py;.
+
+Metodene \verb;createHSIFromRGB; og \verb;createRGBFromHSI; inneholder utregningen av verdier basert på hhv. RGB og HSI.
+
+Funksjonaliteten er en integrert del av numpy-weave-backenden og brukes dersom formen (shapen) på dataene som er importert med numpy er med tre dimmensjoner, à la (375, 500, 3). Siden arrayet blir gjort om til et endimmensjonalt array i weave brukes antallet componenter/kanaler til å beregne indexen for hver pixel i C-implementasjonen, slik som her;
+
+%@import
+// Calculate index of current pixel
+current = (i * width + j) * channels;
+%@
+
+(Variablene i og j svarer til hhv. raden og kolonnen i bildet.)
