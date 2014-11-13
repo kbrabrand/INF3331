@@ -2,7 +2,7 @@ Oblig 3
 ==================
 
 #Documentation
-Explanation of tasks can be found in [oblig3.tex](https://github.com/UiO-INF3331/INF3331-Kristoffer/tree/master/oblig2/report/oblig3.tex) or [oblig3.pdf](https://github.com/UiO-INF3331/INF3331-Kristoffer/raw/master/oblig2/report/oblig3.pdf) in the report folder, and in the inline code comments.
+Explanation of tasks can be found in [oblig3.tex](https://github.com/UiO-INF3331/INF3331-Kristoffer/tree/master/oblig3/report/oblig3.tex) or [oblig3.pdf](https://github.com/UiO-INF3331/INF3331-Kristoffer/raw/master/oblig3/report/oblig3.pdf) in the report folder, and in the inline code comments.
 
 #Installation
 There's not much to install really, but in order to use the pure C backend (no support for color images or linear manipulation) you will first need to build the c files.
