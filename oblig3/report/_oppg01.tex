@@ -25,36 +25,33 @@ Nedenfor vises originalbildet, og videre vises dette bildet denoiset med en kapp
 
 \pagebreak
 
+\begin{figure}[!h]
+\centering
 %@exec
 python denoise.py disasterbefore.jpg out.jpg --kappa=0.1 --iter=10
 %@
-
-\begin{figure}[!h]
-\centering
 \includegraphics[width=90mm]{nw-01-10}
 \caption{Denoised with numpy-weave, kappa=0.1, iter=10 \label{nw-mono}}
 \end{figure}
 
 \pagebreak
 
+\begin{figure}[!h]
+\centering
 %@exec
 python denoise.py disasterbefore.jpg out.jpg --kappa=0.1 --iter=10 --backend=python
 %@
-
-\begin{figure}[!h]
-\centering
 \includegraphics[width=90mm]{p-01-10}
 \caption{Denoised with python, kappa=0.1, iter=10 \label{p-mono}}
 \end{figure}
 
 \pagebreak
 
+\begin{figure}[!h]
+\centering
 %@exec
 python denoise.py disasterbefore.jpg out.jpg --kappa=0.1 --iter=10 --backend=c
 %@
-
-\begin{figure}[!h]
-\centering
 \includegraphics[width=90mm]{nw-01-10}
 \caption{Denoised with denoise\_c, kappa=0.1, iter=10 \label{c-mono}}
 \end{figure}

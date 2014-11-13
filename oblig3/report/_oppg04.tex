@@ -26,13 +26,12 @@ Det er implementert sjekker for å sørge for at ingen manipulering fører til v
 
 \pagebreak
 
+\begin{figure}[!h]
+\centering
 %@exec
 python denoise.py assets/disasterbeforecolor.jpg \
 report/images/nw-color-02-5-100-02.jpg --kappa=0.2 --iter=5 --lr=100 --ls=-0.2
 %@
-
-\begin{figure}[!h]
-\centering
 \includegraphics[width=90mm]{nw-color-02-5-100-02}
 \caption{Denoised with numpy-weave, kappa=0.2, iter=5, r=100, s=-0.2}
 \end{figure}

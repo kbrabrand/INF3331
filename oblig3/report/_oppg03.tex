@@ -17,9 +17,7 @@ current = (i * width + j) * channels;
 
 \subsection*{Eksemepel på denoising av fargebilde}
 
-Ovenfor vises et fargebilde med støy i, og nedenfor vises fargebildet denoiset med numpy-weave og til slutt denoiset og med økt R- og redusert S-komponent.
-
-\pagebreak
+Ovenfor vises et fargebilde med støy i, og nedenfor vises fargebildet denoiset med numpy-weave.
 
 \begin{figure}[!h]
 \centering
@@ -29,13 +27,12 @@ Ovenfor vises et fargebilde med støy i, og nedenfor vises fargebildet denoiset 
 
 \pagebreak
 
+\begin{figure}[!h]
+\centering
 %@exec
 python denoise.py assets/disasterbeforecolor.jpg \
 report/images/nw-color-02-5.jpg --kappa=0.2 --iter=5
 %@
-
-\begin{figure}[!h]
-\centering
 \includegraphics[width=90mm]{nw-color-02-5}
 \caption{Denoised with numpy-weave, kappa=0.2, iter=5}
 \end{figure}
