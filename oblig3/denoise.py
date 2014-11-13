@@ -22,8 +22,8 @@ if __name__ == "__main__":
     parser.add_argument('--lg', metavar='N', type=int, help='Amount to add to or remove from the G channel (RGB).', default=0);
     parser.add_argument('--lb', metavar='N', type=int, help='Amount to add to or remove from the B channel (RGB).', default=0);
     parser.add_argument('--lh', metavar='N', type=int, help='Amount to add to or remove from the H component (HSI).', default=0.0);
-    parser.add_argument('--ls', metavar='N', type=restricted_float, help='Amount to add to or remove from the S component (HSI).', default=0.0);
-    parser.add_argument('--li', metavar='N', type=restricted_float, help='Amount to add to or remove from the I component (HSI).', default=0.0);
+    parser.add_argument('--ls', metavar='N', type=float, help='Amount to add to or remove from the S component (HSI).', default=0.0);
+    parser.add_argument('--li', metavar='N', type=float, help='Amount to add to or remove from the I component (HSI).', default=0.0);
 
     # Parse params
     args = parser.parse_args();
