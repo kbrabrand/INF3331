@@ -23,12 +23,22 @@ $ python denoise.py source-file.jpg destination-file.jpg
 ```
 
 #Tests
-Doctests for internal functions in the preprocessor. Test suites for the larger blocks of the application.
+Doctests for internal functions in the denoiser backends and helper modules. As commented in the report, writing I didn't really see the point of implementing a test suite for this assignment as it would just be re-doing what's already done with the integrationtests in form of doctests on the backends.
 
-The tests suites can be run using nose;
-
+For running the speed comparison test
 ```bash
-$ nosetest
+$ python test_speed_test.py
+```
+
+For running the profiling
+```bash
+$ python test_profiling.py
+```
+
+For running the file comparison, issue the following command with an optional eps-argument following the script name.
+```bash
+$ python test_file_comparison.py
+$ python test_file_comparison.py 5
 ```
 
 – Kristoffer
