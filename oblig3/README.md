@@ -23,7 +23,7 @@ $ python denoise.py source-file.jpg destination-file.jpg
 ```
 
 #Tests
-Doctests for internal functions in the denoiser backends and helper modules. As commented in the report, writing I didn't really see the point of implementing a test suite for this assignment as it would just be re-doing what's already done with the integrationtests in form of doctests on the backends.
+Doctests for internal functions in the denoiser backends and helper modules. As commented in the report, I didn't really see the point of implementing a test suite for this assignment as it would just be re-doing what's already done with the integration tests in form of doctests on the backends.
 
 For running the speed comparison test
 ```bash
